@@ -1,6 +1,6 @@
 #include "playfield.h"
 #include "player.h"
-#include "enemycharacter.h"
+#include "characters/enemycharacter.h"
 
 char* mapdata = "  + + + + + + + + + + + +  " \
 "   2                   3   " \

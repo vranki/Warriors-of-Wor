@@ -17,6 +17,7 @@ class Character;
 class LazorBeam : public QObject, public QGraphicsItem
 {
     Q_OBJECT
+    Q_INTERFACES(QGraphicsItem)
 public:
     LazorBeam(QObject *parent, PlayfieldInfo *pfinfo, QPointF dir, SamplePlayer *smp, bool enemys);
     void tick(float dt);

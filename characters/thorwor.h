@@ -1,7 +1,7 @@
 #ifndef THORWOR_H
 #define THORWOR_H
 
-#include <stealthcharacter.h>
+#include "stealthcharacter.h"
 
 class Thorwor : public StealthCharacter
 {

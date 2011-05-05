@@ -3,12 +3,12 @@
 #include <QGraphicsPixmapItem>
 #include <QGraphicsScene>
 #include "gamemode.h"
-#include "enemycharacter.h"
-#include "burwor.h"
-#include "garwor.h"
-#include "thorwor.h"
-#include "worluk.h"
-#include "wizard.h"
+#include "characters/enemycharacter.h"
+#include "characters/burwor.h"
+#include "characters/garwor.h"
+#include "characters/thorwor.h"
+#include "characters/worluk.h"
+#include "characters/wizard.h"
 #include "playfield.h"
 
 #define ENEMY_COUNT 6

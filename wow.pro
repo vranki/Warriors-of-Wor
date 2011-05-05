@@ -16,7 +16,7 @@ LIBS += -lSDL_mixer
 SOURCES += main.cpp\
         mainwindow.cpp \
     playfield.cpp \
-    character.cpp \
+    characters/character.cpp \
     playfieldinfo.cpp \
     maptile.cpp \
     lazorbeam.cpp \
@@ -36,19 +36,19 @@ SOURCES += main.cpp\
     gamemodedeathmatch.cpp \
     gamemode.cpp \
     gamemodeclassic.cpp \
-    burwor.cpp \
-    worrior.cpp \
-    enemycharacter.cpp \
-    garwor.cpp \
+    characters/burwor.cpp \
+    characters/worrior.cpp \
+    characters/enemycharacter.cpp \
+    characters/garwor.cpp \
     radar.cpp \
-    stealthcharacter.cpp \
-    thorwor.cpp \
-    worluk.cpp \
-    wizard.cpp
+    characters/stealthcharacter.cpp \
+    characters/thorwor.cpp \
+    characters/worluk.cpp \
+    characters/wizard.cpp
 
 HEADERS  += mainwindow.h \
     playfield.h \
-    character.h \
+    characters/character.h \
     playfieldinfo.h \
     maptile.h \
     lazorbeam.h \
@@ -68,14 +68,14 @@ HEADERS  += mainwindow.h \
     gamemodedeathmatch.h \
     gamemode.h \
     gamemodeclassic.h \
-    burwor.h \
-    worrior.h \
-    enemycharacter.h \
-    garwor.h \
+    characters/burwor.h \
+    characters/worrior.h \
+    characters/enemycharacter.h \
+    characters/garwor.h \
     radar.h \
-    stealthcharacter.h \
-    thorwor.h \
-    worluk.h \
-    wizard.h
+    characters/stealthcharacter.h \
+    characters/thorwor.h \
+    characters/worluk.h \
+    characters/wizard.h
 
 FORMS    += mainwindow.ui

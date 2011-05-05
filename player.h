@@ -4,7 +4,7 @@
 #include <QObject>
 #include <QGraphicsItem>
 #include <QTimer>
-#include "worrior.h"
+#include "characters/worrior.h"
 #include "playfieldinfo.h"
 #include "C64Palette.h"
 

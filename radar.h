@@ -6,7 +6,7 @@
 #include <C64Palette.h>
 #include <QList>
 #include <QTimer>
-#include "character.h"
+#include "characters/character.h"
 
 #define RADARW 95
 #define RADARH 40

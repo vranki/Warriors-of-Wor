@@ -1,4 +1,5 @@
 #include "sprite.h"
+#include <QDebug>
 
 Sprite::Sprite(QObject *parent) : QObject(parent), QGraphicsPixmapItem(){
 }
@@ -11,6 +12,9 @@ QPixmap Sprite::loadBitmap(QString filename, int colorindex) {
 
 QPixmap Sprite::loadBitmap(QString filename, QColor color) {
     QImage image(filename);
+    if(image.isNull()) {
+        qDebug() << Q_FUNC_INFO << "Unable to load image " << filename;
+    }
     image = image.convertToFormat(QImage::Format_ARGB32_Premultiplied);
     for(int x=0;x < image.width();x++) {
         for(int y=0;y < image.height();y++) {
