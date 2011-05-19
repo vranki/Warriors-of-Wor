@@ -289,8 +289,7 @@ void GameModeClassic::setupNewEnemy(EnemyCharacter *c) {
     field->scene()->addItem(c);
     characters.append(c);
     c->setDirection(QPoint(-1,0));
-    c->setSpeedScale(1.0f+((float)gameRound)/5.0f);
-    qDebug() << Q_FUNC_INFO << "Added new enemy at " << c->pos() << "tile" << field->tileAt(c->pos())->position() << "walls" << field->tileAt(c->pos())->walls();
+    c->setSpeedScale(1.0f+((float)gameRound)/4.0f);
     monstersSpawned++;
 }
 

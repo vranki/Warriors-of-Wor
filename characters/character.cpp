@@ -85,9 +85,16 @@ void Character::tick(float dt) {
             }
         }
     }
-    direction=QPoint(newControlDir * characterSpeed * speedScale);
-    QPointF movement = QPointF((direction * dt).x(), (direction * dt).y());
-
+    _direction=QPoint(newControlDir * characterSpeed * speedScale);
+    QPointF movement = QPointF((_direction * dt).x(), (_direction * dt).y());
+    // Limit speed on really slow FPS
+    /*
+    float maxMovement = TILEW/2;
+    if(movement.x() > maxMovement) movement.setX(maxMovement);
+    if(movement.x() < -maxMovement) movement.setX(-maxMovement);
+    if(movement.y() > maxMovement) movement.setY(maxMovement);
+    if(movement.y() < -maxMovement) movement.setY(-maxMovement);
+*/
     QPointF newPos = pos() + movement;
 
     if(!currentTile()->e() && newPos.x() > currentTile()->x()) {
@@ -130,8 +137,8 @@ void Character::tick(float dt) {
 void Character::spawnTick(float dt) {
     Q_ASSERT(isVisible());
     if(!isVisible()) return;
-    direction = forcedMoveDir*characterSpeed*speedScale;
-    moveBy((direction.x() * dt), (direction.y()*dt));
+    _direction = forcedMoveDir*characterSpeed*speedScale;
+    moveBy((_direction.x() * dt), (_direction.y()*dt));
     Q_ASSERT(forcedmoveTarget);
 
     bool targetReached = false;
@@ -300,6 +307,7 @@ void Character::killCharacter(bool blinkfirst) {
 void Character::fireWeapon() {
     if(lazorBeam) return;
     if(dead) return;
+    if(forcedmoveTarget) return;
     if(spriteDir.x() > 0 && !currentTile()->e())
         return;
     if(spriteDir.x() < 0 && !currentTile()->w() && pos().x() - currentTile()->coords().x() < TILEW/2)
@@ -337,4 +345,8 @@ void Character::lazorDestroyed() {
 
 QColor Character::color() {
     return myColor;
+}
+
+QPointF Character::direction() {
+    return _direction;
 }

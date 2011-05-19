@@ -28,6 +28,7 @@ public:
     static const int MT_S=1<<3;
 
     MapTile(TilePos);
+    ~MapTile();
     QRectF boundingRect() const;
     void paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget);
     void setNeightbors(MapTile *nn, MapTile *ns, MapTile *nw, MapTile *ne);

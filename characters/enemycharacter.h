@@ -17,7 +17,7 @@ public slots:
 protected:
     bool canShoot;
     int shootingProbability; // Less = more
-
+    MapTile* lastTurnInTile; // In which tile turned last time (to prevent turning many times)
 };
 
 #endif // ENEMYCHARACTER_H

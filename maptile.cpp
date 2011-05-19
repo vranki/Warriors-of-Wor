@@ -68,6 +68,13 @@ MapTile::MapTile(TilePos newPos) : QObject(), QGraphicsItem() {
     setMode(0);
 }
 
+MapTile::~MapTile() {
+    for(int i=0;i<6;i++) {
+        delete nPixmap[i];
+        delete wPixmap[i];
+    }
+}
+
 void MapTile::setNeightbors(MapTile *nn, MapTile *ns, MapTile *nw, MapTile *ne) {
     mn = nn;
     ms = ns;

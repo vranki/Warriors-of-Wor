@@ -77,14 +77,11 @@ char* mapdata = "  + + + + + + + + + + + +  " \
 "  + + + + + + + + + + + +  ";
 
 Playfield::Playfield(QObject *parent, QList<Character*> &chars) : QObject(parent), _scene(), characters(chars) {
-    for(int x=0;x < MAPW;x++) {
-        for(int y=0;y < MAPH; y++) {
-            if(mapTiles[x][y]) {
-                mapTiles[x][y] = 0;
-            }
-        }
-    }
-    _scene.setBackgroundBrush(QBrush(QColor("black")));
+    for(int x=0;x < MAPW;x++)
+        for(int y=0;y < MAPH; y++)
+            mapTiles[x][y] = 0;
+
+        _scene.setBackgroundBrush(QBrush(QColor("black")));
     levelNameItem = new QGraphicsSimpleTextItem(0, &_scene);
     levelNameItem->setBrush(C64Palette::color(2));
     QFont fnt = QFont("Adore64");

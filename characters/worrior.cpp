@@ -60,7 +60,12 @@ void Worrior::tick(float dt) {
             } else if(dynamic_cast<Character*>(item)) {
                 Character *c = dynamic_cast<Character*>(item);
                 if(c->killsPlayer) {
-                    killPlayer = true;
+                    if((c->direction().x() > 0 && c->pos().x() < pos().x()) ||
+                            (c->direction().x() < 0 && c->pos().x() > pos().x()) ||
+                            (c->direction().y() > 0 && c->pos().y() < pos().y()) ||
+                            (c->direction().y() < 0 && c->pos().y() > pos().y())
+                            )
+                        killPlayer = true;
                 }
             }
         }

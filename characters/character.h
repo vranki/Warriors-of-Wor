@@ -32,6 +32,7 @@ public:
     QColor color();
     bool killsPlayer, isEnemy;
     void setCharacterSpeed(float spd);
+    QPointF direction();
 public slots:
     virtual void animationTimeout();
     virtual void setDirection(QPoint dir);
@@ -55,7 +56,7 @@ protected:
     void updateSprite(QPoint dir);
     void spawnTick(float dt);
     virtual void tileEntered(MapTile *mt);
-    QPointF direction;
+    QPointF _direction;
     QPoint controlDir;
     QPoint spriteDir;
     QList<QPixmap> animationPixmaps;

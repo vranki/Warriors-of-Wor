@@ -7,6 +7,10 @@ StealthCharacter::StealthCharacter(QObject *parent,
 {
     stealthMode = false;
     stealthProbability = 0;
+    connect(&checkTimer, SIGNAL(timeout()), this, SLOT(checkIfSeesPlayer()));
+    checkTimer.setInterval(100);
+    checkTimer.setSingleShot(false);
+    checkTimer.start();
 }
 
 void StealthCharacter::tileEntered(MapTile *mt) {
@@ -59,4 +63,15 @@ bool StealthCharacter::seesPlayer() {
     mt = currentTile();
 
     return false;
+}
+
+void StealthCharacter::checkIfSeesPlayer() {
+    if(!stealthMode)
+        return;
+    if(!seesPlayer())
+        return;
+    samples->enemyVisible();
+    setOpacity(1);
+    canShoot = true;
+    stealthMode = false;
 }

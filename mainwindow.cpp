@@ -26,8 +26,12 @@ MainWindow::MainWindow(QWidget *parent) : QGraphicsView(parent), samples(), fiel
     connect(this, SIGNAL(playerFound(Player*)), playerSelectionMenu, SLOT(repaintMenu()));
     gameState = GS_PLAYER_SELECT;
     setViewportUpdateMode(QGraphicsView::MinimalViewportUpdate);
+    setRenderHints(0);
+    setOptimizationFlag(QGraphicsView::DontAdjustForAntialiasing);
+//    setOptimizationFlag(QGraphicsView::DontSavePainterState);
     setGeometry(0,0,640, 400);
     setCursor(Qt::BlankCursor);
+    setFocus();
     show();
     showFullScreen();
 }
@@ -41,6 +45,7 @@ MainWindow::~MainWindow() {
 void MainWindow::loopTimeout() {
     float dt = time.elapsed() / 1000.0;
     time.restart();
+    if(dt > 100) dt = 100; // Limit speed on really slow FPS
     foreach(Character *p, characters)
         p->tick(dt);
     field.tick(dt);

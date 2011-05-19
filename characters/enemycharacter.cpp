@@ -14,10 +14,9 @@ void EnemyCharacter::tick(float dt) {
     if(xaligned && yaligned) {
         QPoint cd = controlDir;
         MapTile* mt = playfield->tileAt(pos() + QPointF(TILEW/2, TILEH/2));
-        if(
-                (cd.x() > 0 && !mt->e()) ||
-                (cd.x() < 0 && !mt->w())
-                ) {
+        Q_ASSERT(mt);
+
+        if((cd.x() > 0 && !mt->e()) || (cd.x() < 0 && !mt->w()) ) {
 //            qDebug() << Q_FUNC_INFO << "e or w wall, turning";
             if(qrand() & 1) {
                 if(mt->s()) {
@@ -52,6 +51,23 @@ void EnemyCharacter::tick(float dt) {
                 }
             }
         }
+
+        if(cd == controlDir && lastTurnInTile != mt) { // No corned turn happened
+            if((qrand() & 5)==0) { // Random turn
+                if(cd.x() && mt->s() && (qrand() & 1)) {
+                    cd = QPoint(0,1);
+                } else if(cd.x() && mt->n() && (qrand() & 1)) {
+                    cd = QPoint(0,-1);
+                } else if(cd.y() && mt->w() && (qrand() & 1)) {
+                    cd = QPoint(-1,0);
+                } else if(cd.y() && mt->e() && (qrand() & 1)) {
+                    cd = QPoint(1,0);
+                }
+            }
+        }
+        if(cd != controlDir) {
+            lastTurnInTile = mt;
+        }
         Q_ASSERT(cd.manhattanLength() > 0);
         setDirection(cd);
         if(shootingProbability > 0 && canShoot && (qrand() % shootingProbability==0))
@@ -72,7 +88,6 @@ void EnemyCharacter::tick(float dt) {
 }
 
 void EnemyCharacter::setSpeedScale(float ss) {
-//    characterSpeed = 20*ss;
     animationTimer.setInterval(animationRate/(ss*characterSpeed));
 }
 
