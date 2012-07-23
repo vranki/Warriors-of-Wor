@@ -45,8 +45,9 @@ void WiimoteFinder::pollMotes() {
 
 void WiimoteFinder::run() {
 //    qDebug() << Q_FUNC_INFO;
-    bdaddr_t *bdaddr=BDADDR_ANY;
-    foundWiimoteHandle = cwiid_open(bdaddr, WiiMote::defaultFlags());
+    bdaddr_t bdaddr = {{0,0,0,0,0,0}};
+    memset(&bdaddr,0,sizeof(bdaddr_t));
+    foundWiimoteHandle = cwiid_open(&bdaddr, WiiMote::defaultFlags());
     foundWiimoteReally = true;
 }
 

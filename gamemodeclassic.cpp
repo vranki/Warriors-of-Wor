@@ -267,7 +267,7 @@ void GameModeClassic::spawnWorluk() {
     field->setMode(true);
     field->setMapName("WORLUK");
     samples->stopbackground();
-    samples->background(11);
+    samples->background(GS_BACKGROUND_WORLUK);
 }
 
 void GameModeClassic::spawnWizard() {

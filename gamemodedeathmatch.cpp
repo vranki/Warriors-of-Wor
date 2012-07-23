@@ -1,4 +1,5 @@
 #include "gamemodedeathmatch.h"
+#include "sampleplayer.h"
 
 GameModeDeathmatch::GameModeDeathmatch(QObject *parent, QList<Character*> &plrs) : GameMode(parent, plrs) {
     winsNeeded = 3;
@@ -95,12 +96,11 @@ void GameModeDeathmatch::gameOver(Player *p) {
     emit showRoundEnd(winner);
 }
 
-
 void GameModeDeathmatch::gameLengthTimerExpired() {
     qDebug() << Q_FUNC_INFO;
     removeWallTimer.start(300);
     samples->stopbackground();
-    samples->background(8);
+    samples->background(GS_BACKGROUND_1);
 }
 
 void GameModeDeathmatch::removeWallTimerExpired() {

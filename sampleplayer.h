@@ -7,29 +7,32 @@
 #include <QMap>
 #include <QDebug>
 #include <QTimer>
+#include <QObject>
 
-class SamplePlayer
-{
-    enum gameSample {
-        GS_SHOOT = 1,
-        GS_BACKGROUND,
-        GS_DEATH,
-        GS_SPAWN,
-        GS_DEATHEXPLOSION,
-        GS_INTROLONG2,
-        GS_ENTER,
-        GS_SCORE,
-        GS_ENEMYSHOOT,
-        GS_ENEMYVISIBLE,
-        GS_BACKGROUND_1,
-        GS_BACKGROUND_2,
-        GS_BACKGROUND_3,
-        GS_WORLUKDIED,
-        GS_WIZARDDIED
-    };
+enum gameSample {
+    GS_SHOOT = 1,
+    GS_BACKGROUND,
+    GS_DEATH,
+    GS_SPAWN,
+    GS_DEATHEXPLOSION,
+    GS_INTROLONG2,
+    GS_ENTER,
+    GS_SCORE,
+    GS_ENEMYSHOOT,
+    GS_ENEMYVISIBLE,
+    GS_BACKGROUND_1,
+    GS_BACKGROUND_2,
+    GS_BACKGROUND_3,
+    GS_BACKGROUND_WORLUK,
+    GS_WORLUKDIED,
+    GS_WIZARDDIED
+};
+
+class SamplePlayer : public QObject {
+    Q_OBJECT
 
 public:
-    SamplePlayer();
+    SamplePlayer(QObject *parent=0);
     ~SamplePlayer();
     void loadSample(QString file, gameSample sample);
     int playSound(gameSample sample, int loops=0);
@@ -37,7 +40,7 @@ public:
     void setBackgroundInterval(int ms);
 public slots:
     int shoot();
-    int background(gameSample sample = 1);
+    int background(gameSample sample = GS_BACKGROUND);
     void stopbackground();
     int death();
     int spawn();

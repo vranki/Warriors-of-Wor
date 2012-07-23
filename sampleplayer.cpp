@@ -1,6 +1,6 @@
 #include "sampleplayer.h"
 
-SamplePlayer::SamplePlayer()
+SamplePlayer::SamplePlayer(QObject *parent) : QObject(parent)
 {
     bgChannel = -1;
     audio_rate = 22050;
@@ -15,23 +15,23 @@ SamplePlayer::SamplePlayer()
     if(Mix_OpenAudio(audio_rate, audio_format, audio_channels, audio_buffers) != 0) {
         qDebug()  << "Unable to initialize audio: " << Mix_GetError();
     }
-    loadSample("samples/shoot.wav");
-    loadSample("samples/bg.wav");
-    loadSample("samples/death.wav");
-    loadSample("samples/spawn.wav");
-    loadSample("samples/deathexplosion.wav");
-    loadSample("samples/intro_long2.wav");
-    loadSample("samples/enter.wav");
-    loadSample("samples/score.wav");
-    loadSample("samples/bg2.wav");
-    loadSample("samples/enemyshoot.wav");
-    loadSample("samples/enemyvisible.wav");
-    loadSample("samples/bg_worluk.wav");
-    loadSample("samples/bg_1.wav");
-    loadSample("samples/bg_2.wav");
-    loadSample("samples/bg_3.wav");
-    loadSample("samples/worluk_died.wav");
-    loadSample("samples/wizard_died.wav");
+    loadSample("samples/shoot.wav", GS_SHOOT);
+    loadSample("samples/bg.wav", GS_BACKGROUND);
+    loadSample("samples/death.wav", GS_DEATH);
+    loadSample("samples/spawn.wav", GS_SPAWN);
+    loadSample("samples/deathexplosion.wav", GS_DEATHEXPLOSION);
+    loadSample("samples/intro_long2.wav", GS_INTROLONG2);
+    loadSample("samples/enter.wav", GS_ENTER);
+    loadSample("samples/score.wav", GS_SCORE);
+    loadSample("samples/bg2.wav", GS_BACKGROUND_2);
+    loadSample("samples/enemyshoot.wav", GS_ENEMYSHOOT);
+    loadSample("samples/enemyvisible.wav", GS_ENEMYVISIBLE);
+    loadSample("samples/bg_worluk.wav", GS_BACKGROUND_WORLUK);
+    loadSample("samples/bg_1.wav", GS_BACKGROUND_1);
+    loadSample("samples/bg_2.wav", GS_BACKGROUND_2);
+    loadSample("samples/bg_3.wav", GS_BACKGROUND_3);
+    loadSample("samples/worluk_died.wav", GS_WORLUKDIED);
+    loadSample("samples/wizard_died.wav", GS_WIZARDDIED);
     connect(&bgTimer, SIGNAL(timeout()), this, SLOT(nextBgSound()));
     bgTimer.setInterval(1000);
     bgTimer.setSingleShot(false);
@@ -145,5 +145,5 @@ void SamplePlayer::nextBgSound() {
     bgSample++;
     if(bgSample > 14)
         bgSample = 12;
-    bgChannel = playSound(bgSample);
+    bgChannel = playSound(GS_BACKGROUND);
 }
