@@ -12,6 +12,7 @@ Worrior::Worrior(QObject *parent, PlayfieldInfo *pfinfo, SamplePlayer *smp, QCol
     animationPixmaps.append(loadBitmap("wow-sprites/spr2F5E.bmp", myColor));
     setPixmap(animationPixmaps.value(0));
     lazorBeam = 0;
+
 }
 
 
@@ -97,6 +98,7 @@ void Worrior::spawnTileLeft() {
 void Worrior::allowSpawn() {
     canspawn = true;
 }
+
 
 void Worrior::animationTimeout() {
     if(shooting) {

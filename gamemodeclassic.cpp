@@ -220,15 +220,7 @@ QList<EnemyCharacter*> GameModeClassic::enemyCharacters() {
     return enemies;
 }
 
-void GameModeClassic::setPlayersControllable(bool controllable) {
-    qDebug() << Q_FUNC_INFO << controllable;
-    foreach(Character *c, characters) {
-        Player *p = qobject_cast<Player*>(c);
-        if(p) {
-            p->setControllable(controllable);
-        }
-    }
-}
+
 
 void GameModeClassic::awardBonusPlayer() {
     qDebug() << Q_FUNC_INFO;

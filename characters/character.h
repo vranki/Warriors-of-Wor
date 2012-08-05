@@ -23,6 +23,10 @@ class Character : public Sprite {
 public:
 //    static const int C_KILLS_PLAYER=1;
 //    static const int C_IS_ENEMY=1<<1;
+    enum WeaponType {
+        WEAPON_LAZOR=0,
+        WEAPON_BOMB
+    };
 public:
     Character(QObject *parent, PlayfieldInfo *pfinfo, SamplePlayer *smp);
     ~Character();
@@ -33,6 +37,8 @@ public:
     bool killsPlayer, isEnemy;
     void setCharacterSpeed(float spd);
     QPointF direction();
+    void setWeaponType(WeaponType newWeaponType);
+    WeaponType weaponType();
 public slots:
     virtual void animationTimeout();
     virtual void setDirection(QPoint dir);
@@ -82,5 +88,7 @@ protected:
     bool characterStopped;
     QColor myColor;
     float animationRate; // Larger = slower
+
+    WeaponType wt;
 };
 #endif // CHARACTER_H

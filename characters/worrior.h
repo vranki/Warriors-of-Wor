@@ -6,10 +6,14 @@
 class Worrior : public Character
 {
     Q_OBJECT
+
 public:
+
+
     explicit Worrior(QObject *parent, PlayfieldInfo *pfinfo, SamplePlayer *smp, QColor color, int playerNum);
     virtual void tick(float dt);
     void allowSpawn();
+
 signals:
 
 public slots:

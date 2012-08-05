@@ -11,6 +11,7 @@ MapTile::MapTile(TilePos newPos) : QObject(), QGraphicsItem() {
     highlight = 0;
     _walls = 0;
     swapOtherImage = 0;
+    tileContent = 0;
     setZValue(-10);
     for(int i=0;i<6;i++) {
         QColor c = C64Palette::color(6);
@@ -64,6 +65,10 @@ MapTile::MapTile(TilePos newPos) : QObject(), QGraphicsItem() {
         painter.end();
         pm->convertFromImage(im);
     }
+
+    fireTimer.setSingleShot(true);
+    connect(&fireTimer, SIGNAL(timeout()), this, SLOT(endFire()));
+    fireTimer.setInterval(1000);
 
     setMode(0);
 }
@@ -135,8 +140,11 @@ QRectF MapTile::boundingRect() const {
 
 void MapTile::paint(QPainter *painter, const QStyleOptionGraphicsItem *option,
                     QWidget *widget) {
-    if(!highlight) return;
-    painter->drawRect(QRect(0,0,25,25));
+    //if(!highlight) return;
+    if(content() & MT_CONTENT_FIRE)
+        painter->setBrush(C64Palette::color(7));
+    if(content())
+        painter->drawRect(QRect(0,0,25,25));
 }
 
 void MapTile::setHighlight(bool hl) {
@@ -161,6 +169,26 @@ void MapTile::setMode(int m) {
     wp.setPixmap(*wPixmap[mode*2]);
 }
 
+void MapTile::setContent(int newContent)
+{
+    int oldContent = content();
+    tileContent = newContent;
+    if(!(oldContent & MT_CONTENT_FIRE) && newContent & MT_CONTENT_FIRE) {
+        fireTimer.start();
+    }
+    if(oldContent != newContent) {
+        qDebug() << Q_FUNC_INFO << "at" << position();
+
+        emit contentChanged(tileContent);
+        update();
+    }
+}
+
+int MapTile::content()
+{
+    return tileContent;
+}
+
 void MapTile::changePattern() {
     if(swapOtherImage) {
         np.setPixmap(*nPixmap[mode*2]);
@@ -170,4 +198,10 @@ void MapTile::changePattern() {
         wp.setPixmap(*wPixmap[mode*2+1]);
     }
     swapOtherImage = !swapOtherImage;
+}
+
+void MapTile::endFire()
+{
+    if(content() & MT_CONTENT_FIRE)
+        setContent(content() - MT_CONTENT_FIRE);
 }

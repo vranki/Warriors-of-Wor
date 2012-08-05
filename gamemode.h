@@ -21,6 +21,7 @@ signals:
 public slots:
 
 protected:
+    void setPlayersControllable(bool c);
     QList<Character*> &characters;
     Playfield *field;
     SamplePlayer *samples;

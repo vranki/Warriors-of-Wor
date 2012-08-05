@@ -1,4 +1,7 @@
 #include "gameselectionmenu.h"
+#include "gamemodedeathmatch.h"
+#include "gamemodeclassic.h"
+#include "gamemodebomberman.h"
 
 GameSelectionMenu::GameSelectionMenu(QObject *parent, QList<Character*> &plrs) : QObject(parent), QGraphicsItem(), characters(plrs) {
     colorCycle = 0;
@@ -55,5 +58,7 @@ void GameSelectionMenu::controlInput(QPoint dir) {
         currentGameMode = new GameModeClassic(parent(), characters); // NOT this!
     } else if(gameModeNumber==1) {
          currentGameMode = new GameModeDeathmatch(parent(), characters); // NOT this!
-    }
+    } else if(gameModeNumber==2) {
+        currentGameMode = new GameModeBomberman(parent(), characters); // NOT this!
+   }
 }

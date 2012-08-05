@@ -1,9 +1,10 @@
 #include "character.h"
+#include "bomb.h"
 
 Character::Character(QObject *parent,
                      PlayfieldInfo *pfinfo,
                      SamplePlayer *smp) :
-Sprite(parent) {
+    Sprite(parent) {
     currentAnimationPixmap = 0;
     playfield = pfinfo;
     samples = smp;
@@ -15,6 +16,7 @@ Sprite(parent) {
     speedScale = 1;
     animationRate = 5000;
     setCharacterSpeed(50);
+    wt = WEAPON_LAZOR;
 }
 Character::~Character() {
 }
@@ -132,6 +134,9 @@ void Character::tick(float dt) {
         tiles[1] = bottomRight;
         tileEntered(bottomRight);
     }
+
+    if(playfield->tileAt(pos() + QPointF(TILEW/2, TILEH/2))->content() & MapTile::MT_CONTENT_FIRE)
+        killCharacter(true);
 }
 
 void Character::spawnTick(float dt) {
@@ -143,9 +148,9 @@ void Character::spawnTick(float dt) {
 
     bool targetReached = false;
     if((forcedMoveDir.y() > 0 && pos().y() > forcedmoveTarget->pos().y()) ||
-       (forcedMoveDir.y() < 0 && pos().y() < forcedmoveTarget->pos().y()) ||
-       (forcedMoveDir.x() < 0 && pos().x() < forcedmoveTarget->pos().x()) ||
-       (forcedMoveDir.x() > 0 && pos().x() > forcedmoveTarget->pos().x()))
+            (forcedMoveDir.y() < 0 && pos().y() < forcedmoveTarget->pos().y()) ||
+            (forcedMoveDir.x() < 0 && pos().x() < forcedmoveTarget->pos().x()) ||
+            (forcedMoveDir.x() > 0 && pos().x() > forcedmoveTarget->pos().x()))
         targetReached = true;
     if(targetReached) {
         setPos(forcedmoveTarget->pos());
@@ -178,7 +183,7 @@ void Character::updateSprite(QPoint dir) {
         characterStopped = true;
     }
     if(dir.y() > 0)
-       tf.rotate(90);
+        tf.rotate(90);
     if(dir.y() < 0)
         tf.rotate(-90);
     if(dir.x() < 0) {
@@ -284,7 +289,7 @@ void Character::makeVulnerable() {
 
 
 void Character::setControllable(bool ctrlable) {
-/*    qDebug() << Q_FUNC_INFO << ctrlable;
+    /*    qDebug() << Q_FUNC_INFO << ctrlable;
     Q_ASSERT(!ctrlable);*/
     controllable = ctrlable;
     if(!controllable)
@@ -305,35 +310,41 @@ void Character::killCharacter(bool blinkfirst) {
 }
 
 void Character::fireWeapon() {
-    if(lazorBeam) return;
     if(dead) return;
     if(forcedmoveTarget) return;
-    if(spriteDir.x() > 0 && !currentTile()->e())
-        return;
-    if(spriteDir.x() < 0 && !currentTile()->w() && pos().x() - currentTile()->coords().x() < TILEW/2)
-        return;
-    if(spriteDir.y() > 0 && !currentTile()->s())
-        return;
-    if(spriteDir.y() < 0 && !currentTile()->n() && pos().y() - currentTile()->coords().y() < TILEH/2)
-        return;
+    if(weaponType()==WEAPON_LAZOR) {
+        if(lazorBeam) return;
+        if(spriteDir.x() > 0 && !currentTile()->e())
+            return;
+        if(spriteDir.x() < 0 && !currentTile()->w() && pos().x() - currentTile()->coords().x() < TILEW/2)
+            return;
+        if(spriteDir.y() > 0 && !currentTile()->s())
+            return;
+        if(spriteDir.y() < 0 && !currentTile()->n() && pos().y() - currentTile()->coords().y() < TILEH/2)
+            return;
 
-    lazorBeam = new LazorBeam(this, playfield, QPointF(spriteDir*200), samples, isEnemy);
-    lazorBeam->setPos(pos());
-    if(spriteDir.y() < 0)
-        lazorBeam->moveBy(0,-TILEH/2);
-    if(spriteDir.y() > 0)
-        lazorBeam->moveBy(0,TILEH/2);
-    if(spriteDir.x() < 0)
-        lazorBeam->moveBy(-TILEW/2,0);
-    if(spriteDir.x() > 0)
-        lazorBeam->moveBy(TILEH/2,0);
-    lazorBeam->moveBy(TILEW/2, TILEH/2);
-    scene()->addItem(lazorBeam);
-    connect(lazorBeam, SIGNAL(hitWall()), this, SLOT(lazorDestroyed()));
-    connect(lazorBeam, SIGNAL(hitCharacter(Character*)), this, SIGNAL(lazorHitCharacter(Character*)));
-    shooting = true;
-    QTimer::singleShot(100, this, SLOT(stopShooting()));
-    animationTimeout();
+        lazorBeam = new LazorBeam(this, playfield, QPointF(spriteDir*200), samples, isEnemy);
+        lazorBeam->setPos(pos());
+        if(spriteDir.y() < 0)
+            lazorBeam->moveBy(0,-TILEH/2);
+        if(spriteDir.y() > 0)
+            lazorBeam->moveBy(0,TILEH/2);
+        if(spriteDir.x() < 0)
+            lazorBeam->moveBy(-TILEW/2,0);
+        if(spriteDir.x() > 0)
+            lazorBeam->moveBy(TILEH/2,0);
+        lazorBeam->moveBy(TILEW/2, TILEH/2);
+        scene()->addItem(lazorBeam);
+        connect(lazorBeam, SIGNAL(hitWall()), this, SLOT(lazorDestroyed()));
+        connect(lazorBeam, SIGNAL(hitCharacter(Character*)), this, SIGNAL(lazorHitCharacter(Character*)));
+        shooting = true;
+        QTimer::singleShot(100, this, SLOT(stopShooting()));
+        animationTimeout();
+    } else if(weaponType()==WEAPON_BOMB) {
+        Bomb *bomb = new Bomb(this, playfield, samples, 3);
+        bomb->setPos( playfield->tileAt(pos() + QPointF(TILEW/2, TILEH/2))->pos());
+        scene()->addItem(bomb);
+    }
 }
 
 void Character::lazorDestroyed() {
@@ -349,4 +360,14 @@ QColor Character::color() {
 
 QPointF Character::direction() {
     return _direction;
+}
+
+void Character::setWeaponType(Character::WeaponType newWeaponType)
+{
+    wt = newWeaponType;
+}
+
+Character::WeaponType Character::weaponType()
+{
+    return wt;
 }

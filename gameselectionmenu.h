@@ -4,13 +4,12 @@
 #include <QGraphicsItem>
 #include <QPainter>
 #include <C64Palette.h>
-#include "gamemodedeathmatch.h"
-#include "gamemodeclassic.h"
+#include "gamemode.h"
 #include <QFontDatabase>
 #include <QFont>
 #include <QTimer>
 
-#define GAME_MODE_COUNT 2
+#define GAME_MODE_COUNT 3
 
 class GameSelectionMenu : public QObject, public QGraphicsItem {
     Q_OBJECT

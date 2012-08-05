@@ -52,7 +52,7 @@ private:
     void spawnWizard();
     void setupNewEnemy(EnemyCharacter *c);
     void killAllEnemies();
-    void setPlayersControllable(bool c);
+
     void setGameState(GameState newState);
     void awardBonusPlayer();
     QList<EnemyCharacter*> enemyCharacters();

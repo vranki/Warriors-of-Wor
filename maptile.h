@@ -27,6 +27,11 @@ public:
     static const int MT_N=1<<2;
     static const int MT_S=1<<3;
 
+    static const int MT_CONTENT_FIRE=1;
+    static const int MT_CONTENT_BLOCK=1<<1;
+    static const int MT_CONTENT_SAND=1<<2;
+
+
     MapTile(TilePos);
     ~MapTile();
     QRectF boundingRect() const;
@@ -44,8 +49,15 @@ public:
     int walls();
     virtual void setWalls(int nw);
     void setMode(int m);
+    void setContent(int newContent);
+    int content();
 public slots:
     void changePattern();
+signals:
+    void contentChanged(int newContent);
+private slots:
+    void endFire();
+
 private:
     TilePos myPos;
     MapTile *mn, *ms, *mw, *me;
@@ -55,6 +67,9 @@ private:
     QPixmap *nPixmap[6], *wPixmap[6];
     int mode; // 0=normal, 1=worluk, 2=wizard
     bool swapOtherImage;
+    bool fireTile;
+    int tileContent;
+    QTimer fireTimer;
 };
 
 #endif // MAPTILE_H
