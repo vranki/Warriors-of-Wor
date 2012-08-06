@@ -79,6 +79,7 @@ void Bomb::explode()
         distanceExploded++;
     }
     colorChangeTimer.stop();
+    playfield->updateContent();
     scene()->removeItem(this);
     disconnect(this);
     //deleteLater(); @todo crashes, delete properly

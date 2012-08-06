@@ -18,6 +18,7 @@ public:
     virtual bool tileContainsPlayer(MapTile *mt)=0;
     virtual bool tileContainsEnemy(MapTile *mt)=0;
     virtual bool tileIsValidLocation(MapTile *mt)=0;
+    virtual void updateContent()=0;
 };
 
 #endif // PLAYFIELDINFO_H

@@ -70,6 +70,12 @@ MapTile::MapTile(TilePos newPos) : QObject(), QGraphicsItem() {
     connect(&fireTimer, SIGNAL(timeout()), this, SLOT(endFire()));
     fireTimer.setInterval(1000);
 
+    fireCenterPixmap = Sprite::loadBitmap("wow-sprites/fire-center.bmp", C64Palette::color(7));
+    fireHorizontalPixmap = Sprite::loadBitmap("wow-sprites/fire-horizontal.bmp", C64Palette::color(7));
+    fireVerticalPixmap = Sprite::loadBitmap("wow-sprites/fire-vertical.bmp", C64Palette::color(7));
+    fireItem.setParentItem(this);
+    fireItem.setZValue(-20);
+    fireItem.setVisible(false);
     setMode(0);
 }
 
@@ -141,10 +147,8 @@ QRectF MapTile::boundingRect() const {
 void MapTile::paint(QPainter *painter, const QStyleOptionGraphicsItem *option,
                     QWidget *widget) {
     //if(!highlight) return;
-    if(content() & MT_CONTENT_FIRE)
-        painter->setBrush(C64Palette::color(7));
-    if(content())
-        painter->drawRect(QRect(0,0,25,25));
+    //if(content())
+    //    painter->drawRect(QRect(0,0,25,25));
 }
 
 void MapTile::setHighlight(bool hl) {
@@ -176,9 +180,8 @@ void MapTile::setContent(int newContent)
     if(!(oldContent & MT_CONTENT_FIRE) && newContent & MT_CONTENT_FIRE) {
         fireTimer.start();
     }
+    updateFireTile();
     if(oldContent != newContent) {
-        qDebug() << Q_FUNC_INFO << "at" << position();
-
         emit contentChanged(tileContent);
         update();
     }
@@ -204,4 +207,32 @@ void MapTile::endFire()
 {
     if(content() & MT_CONTENT_FIRE)
         setContent(content() - MT_CONTENT_FIRE);
+}
+
+void MapTile::updateFireTile()
+{
+    if(content() & MT_CONTENT_FIRE) {
+        bool hFire = false, vFire = false;
+        if(w() && w()->content() & MT_CONTENT_FIRE)
+            hFire = true;
+        if(e() && e()->content() & MT_CONTENT_FIRE)
+            hFire = true;
+        if(n() && n()->content() & MT_CONTENT_FIRE)
+            vFire = true;
+        if(s() && s()->content() & MT_CONTENT_FIRE)
+            vFire = true;
+
+        if(vFire && hFire) {
+            fireItem.setPixmap(fireCenterPixmap);
+        } else if(vFire) {
+            fireItem.setPixmap(fireVerticalPixmap);
+        } else if(hFire) {
+            fireItem.setPixmap(fireHorizontalPixmap);
+        } else {
+            fireItem.setPixmap(fireCenterPixmap);
+        }
+        fireItem.setVisible(true);
+    } else {
+        fireItem.setVisible(false);
+    }
 }

@@ -334,6 +334,16 @@ void Playfield::changePattern() {
             mt->changePattern();
         }
 }
+
+void Playfield::updateContent()
+{
+    for(int x=0;x<MAPW;x++)
+        for(int y=0;y<MAPH;y++) {
+            MapTile *mt = tileAt(QPoint(x,y));
+            mt->updateFireTile();
+        }
+}
+
 bool Playfield::tileIsValidLocation(MapTile *mt) {
     bool isValid = true;
     if(!mt)

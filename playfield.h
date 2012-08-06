@@ -43,10 +43,12 @@ public:
     void setMode(int m);
     virtual MapTile *randomTile(bool notCloseToCharacters=false); // On playfield
     void setBackgroundColor(QColor c);
+    virtual void updateContent();
 signals:
 
 public slots:
     void changePattern();
+
 private:
     QGraphicsScene _scene;
 //    QVector<QVector<MapTile*> > mapTiles;

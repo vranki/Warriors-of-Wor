@@ -53,6 +53,7 @@ public:
     int content();
 public slots:
     void changePattern();
+    void updateFireTile();
 signals:
     void contentChanged(int newContent);
 private slots:
@@ -63,8 +64,8 @@ private:
     MapTile *mn, *ms, *mw, *me;
     bool highlight;
     int _walls;
-    QGraphicsPixmapItem np, wp;
-    QPixmap *nPixmap[6], *wPixmap[6];
+    QGraphicsPixmapItem np, wp, fireItem;
+    QPixmap *nPixmap[6], *wPixmap[6], fireCenterPixmap, fireHorizontalPixmap, fireVerticalPixmap;
     int mode; // 0=normal, 1=worluk, 2=wizard
     bool swapOtherImage;
     bool fireTile;

@@ -44,7 +44,9 @@ SOURCES += main.cpp\
     characters/stealthcharacter.cpp \
     characters/thorwor.cpp \
     characters/worluk.cpp \
-    characters/wizard.cpp
+    characters/wizard.cpp \
+    gamemodebomberman.cpp \
+    bomb.cpp
 
 HEADERS  += mainwindow.h \
     playfield.h \
@@ -76,6 +78,8 @@ HEADERS  += mainwindow.h \
     characters/stealthcharacter.h \
     characters/thorwor.h \
     characters/worluk.h \
-    characters/wizard.h
+    characters/wizard.h \
+    gamemodebomberman.h \
+    bomb.h
 
 FORMS    += mainwindow.ui
