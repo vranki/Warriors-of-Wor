@@ -1,12 +1,12 @@
-      ***********************
-      *** WARRIORS OF WOR ***
-      ***********************
+      *****************************
+      *** BOMBERWARRIORS OF WOR ***
+      *****************************
 
  By Ville Ranki <ville.ranki@iki.fi>
 
 
-WOW is a remake and enhanced version of Commodore 64's 
-Wizard of Wor game. It supports 2 game modes and up to 8 
+BWOW is a remake and enhanced version of Commodore 64's 
+Wizard of Wor game. It supports 3 game modes and up to 8 
 players using Wiimotes.
 
 It has been very successfull as a party game, although
@@ -23,6 +23,8 @@ Deathmatch:
  - Winner of each match gets one "Coin". The first player getting five 
    coins wins.
 
+Bomberman:
+ - Much like deathmatch, but with bombs instead of lazorguns.
 
 Pairing wiimotes:
 
@@ -67,6 +69,7 @@ benchmarking.
  - Original game mode still has some bugs. Deathmatch should work
 pretty well.
  - More controller options needed (SDL joystick).
+ - CRT rendering - see http://filthypants.blogspot.fi/2011/05/more-emulator-pixel-shaders-crt-updated.html
 
 Patches are welcome (use Github's merge requests if possible!)
 
@@ -76,12 +79,12 @@ Credits:
 
 Wizard of Wor arcade game by Midway
 Wizard of Wor C64 version by Commodore
+Bomberman by Hudson Soft
 
 I consider WOW as abandonware. If you own the copyright 
-for this game and want this *free* open source version 
+for this game and want this free open source version 
 to be removed, contact me but be prepared for negative 
 PR in press.
-
 
 Adore64 font from:
 http://www.dafont.com/adore64.font
