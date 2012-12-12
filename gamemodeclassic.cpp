@@ -101,15 +101,22 @@ void GameModeClassic::nextIntroPhase() {
         }
         introTimer.start(4000);
     } else if(introPhase==3) {
-        if(getready)
+        if(getready) {
             delete getready;
-        if(go)
+            getready = 0;
+        }
+        if(go) {
             delete go;
-        if(dsd)
+            go = 0;
+        }
+        if(dsd) {
             delete dsd;
-        if(bonusPlayer)
+            dsd = 0;
+        }
+        if(bonusPlayer) {
             delete bonusPlayer;
-
+            bonusPlayer = 0;
+        }
         field->setVisible(true);
         foreach(Character *c, characters)
             c->setVisible(true);
@@ -184,6 +191,7 @@ void GameModeClassic::characterKilled() {
     Q_ASSERT(characters.contains(c));
     characters.removeOne(c);
     delete c;
+    c = 0;
     QList<EnemyCharacter*> enemies = enemyCharacters();
     if(burwor) {
         if(garwors < gameRound && enemies.size()<gameRound)

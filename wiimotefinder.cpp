@@ -7,6 +7,7 @@ WiimoteFinder::WiimoteFinder() : QThread()
     foundWiimoteHandle = 0;
     scanning = false;
 }
+
 WiimoteFinder::~WiimoteFinder()
 {
     if(isRunning())
@@ -18,8 +19,10 @@ void WiimoteFinder::scanMote() {
     scanning = true;
     if(!isRunning()) start();
 }
+
 void WiimoteFinder::stopScan() {
     scanning = false;
+    quit();
 }
 
 void WiimoteFinder::pollMotes() {

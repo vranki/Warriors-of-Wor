@@ -13,7 +13,6 @@ MainWindow::MainWindow(QWidget *parent) : QGraphicsView(parent), samples(), fiel
     mainTimer.setInterval(1000 * 1.0/60.0);
     mainTimer.start();
     time.start();
-    grabKeyboard();
     connect(&wmFinder, SIGNAL(wiimoteFound(WiiMote*)), this, SLOT(wiimoteFound(WiiMote*)));
     wmFinder.scanMote();
     playerSelectionMenu = 0;
@@ -34,12 +33,13 @@ MainWindow::MainWindow(QWidget *parent) : QGraphicsView(parent), samples(), fiel
     setFocus();
     show();
     showFullScreen();
+    grabKeyboard();
 }
 
 MainWindow::~MainWindow() {
     resetPlayers();
     if(gameMode)
-        delete gameMode;
+        gameMode->deleteLater();
 }
 
 void MainWindow::loopTimeout() {
@@ -79,6 +79,7 @@ void MainWindow::keyPressEvent (QKeyEvent * e) {
         wiimoteButtonPressed(4);
         e->accept();
     } else if(e->key()==Qt::Key_Q) {
+        stopGame();
         QCoreApplication::quit();
         e->accept();
     }  else if(e->key()==Qt::Key_F) {
@@ -116,6 +117,11 @@ void MainWindow::setupPlayer(Player* p, QObject *controller) {
     connect(controller, SIGNAL(buttonPressed(int)), p, SLOT(fire(int)));
     emit playerFound(p);
     samples.spawn();
+}
+
+void MainWindow::stopGame() {
+    wmFinder.stopScan();
+    wmFinder.quit();
 }
 
 void MainWindow::keyReleaseEvent (QKeyEvent * e) {
@@ -245,6 +251,6 @@ void MainWindow::showGameEnd(Player *winner) {
     scene()->addItem(gameOverScreen);
     gameState = GS_GAME_END;
     samples.introLong2();
-    delete gameMode;
+    gameMode->deleteLater();
     gameMode = 0;
 }

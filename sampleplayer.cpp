@@ -38,20 +38,23 @@ SamplePlayer::SamplePlayer(QObject *parent) : QObject(parent)
 }
 
 SamplePlayer::~SamplePlayer() {
+    qDebug() << Q_FUNC_INFO;
     foreach(Mix_Chunk *sound, sounds)
         Mix_FreeChunk(sound);
+    /* If these are done, the game crashes on quit. Possibly known SDL bug.
     Mix_CloseAudio();
     SDL_Quit();
+    */
 }
 
 void SamplePlayer::loadSample(QString file, gameSample sample) {
     //Load our WAV file from disk
     Mix_Chunk* sound = Mix_LoadWAV(file.toUtf8().data());
     if(sound == NULL) {
-        qDebug() << "Unable to load WAV file: " << file << Mix_GetError();
-        return;
+        qDebug() << Q_FUNC_INFO << "Unable to load WAV file: " << file << Mix_GetError();
+    } else {
+        sounds[sample] = sound;
     }
-    sounds[sample] = sound;
 }
 
 int SamplePlayer::playSound(gameSample sample, int loops) {
@@ -76,13 +79,13 @@ int SamplePlayer::background(gameSample sample) {
     if(sample >= 0) {
         bgChannel = playSound(sample, -1);
         bgIsLoop = true;
-        return bgChannel;
     } else {
         bgSample = 99;
         bgIsLoop = false;
         bgTimer.start();
         nextBgSound();
     }
+    return bgChannel;
 }
 
 void SamplePlayer::stopbackground() {

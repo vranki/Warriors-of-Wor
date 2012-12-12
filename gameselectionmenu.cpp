@@ -8,7 +8,7 @@ GameSelectionMenu::GameSelectionMenu(QObject *parent, QList<Character*> &plrs) :
     currentGameMode = 0;
     gameModeNumber = 0;
     if(!currentGameMode)
-        currentGameMode = new GameModeClassic(parent, characters); // NOT this!
+        currentGameMode = new GameModeClassic(0, characters); // NOT this!
 }
 
 QRectF GameSelectionMenu::boundingRect() const {
@@ -54,11 +54,12 @@ void GameSelectionMenu::controlInput(QPoint dir) {
         if(gameModeNumber < 0) gameModeNumber = GAME_MODE_COUNT - 1;
     }
     delete currentGameMode;
+    currentGameMode = 0;
     if(gameModeNumber==0) {
-        currentGameMode = new GameModeClassic(parent(), characters); // NOT this!
+        currentGameMode = new GameModeClassic(0, characters); // NOT this!
     } else if(gameModeNumber==1) {
-         currentGameMode = new GameModeDeathmatch(parent(), characters); // NOT this!
+         currentGameMode = new GameModeDeathmatch(0, characters); // NOT this!
     } else if(gameModeNumber==2) {
-        currentGameMode = new GameModeBomberman(parent(), characters); // NOT this!
+        currentGameMode = new GameModeBomberman(0, characters); // NOT this!
    }
 }

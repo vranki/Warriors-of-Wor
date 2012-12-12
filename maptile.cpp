@@ -30,7 +30,6 @@ MapTile::MapTile(TilePos newPos) : QObject(), QGraphicsItem() {
         QPixmap * pm = nPixmap[i];
         QImage im = pm->toImage();
         QPainter painter(&im);
-        painter.begin(&im);
         int y=0;
         if(i % 2==0) y=1;
         for(int x=0;x<im.width();x=x+2) {
@@ -49,8 +48,7 @@ MapTile::MapTile(TilePos newPos) : QObject(), QGraphicsItem() {
     for(int i=2;i<6;i++) {
         QPixmap * pm = wPixmap[i];
         QImage im = pm->toImage();
-        QPainter painter;
-        painter.begin(&im);
+        QPainter painter(&im);
         int y=0;
         if(i % 2==0) y=1;
         for(int x=0;x<im.height();x=x+1) {

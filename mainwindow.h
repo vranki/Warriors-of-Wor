@@ -59,6 +59,7 @@ protected:
     virtual void resizeEvent(QResizeEvent *event);
 private:
     void setupPlayer(Player* p, QObject *controller);
+    void stopGame();
     SamplePlayer samples;
     Playfield field;
     QTimer mainTimer;
