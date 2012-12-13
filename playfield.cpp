@@ -1,94 +1,21 @@
 #include "playfield.h"
 #include "player.h"
 #include "characters/enemycharacter.h"
-
-char* mapdata = "  + + + + + + + + + + + +  " \
-"   2                   3   " \
-"  +-+-+-+-+-+-+-+-+-+-+-+  " \
-"  |   |             |   |  " \
-"  + + + +-+ +-+ +-+ + + +  " \
-" 6| |   |         |   | |7 " \
-"+-+ + +-+ + +-+ + +-+ + +-+" \
-" w        |     |        w " \
-"+-+-+ + + + +-+ + + + +-+-+" \
-"  |   | | |     | | |   |  " \
-"  + + + + + + + + + + + +  " \
-" 4| | |     | |     | | |5 " \
-"  + + + + +-+ +-+ + + + +  " \
-"  |     |         |     |  " \
-"  +-+-+-+-+-+-+-+-+-+-+-+  " \
-"   0                   1   " \
-"  + + + + + + + + + + + +  " \
-"                           " \
-"  + + + + + + + + + + + +  " \
-"   2                   3   " \
-"  +-+-+-+-+-+-+-+-+-+-+-+  " \
-"  |     |         |     |  " \
-"  + +-+ + + +-+ + + +-+ +  " \
-" 6|     | |     | |     |7 " \
-"+-+ +-+ + +-+ +-+ + +-+ +-+" \
-" w    |             |    w " \
-"+-+-+ + + + +-+ + + + +-+-+" \
-"  |     | |     | |     |  " \
-"  + +-+-+ + +-+ + +-+-+ +  " \
-" 4|                     |5 " \
-"  + +-+ + + +-+ + + +-+ +  " \
-"  |     |         |     |  " \
-"  +-+-+-+-+-+-+-+-+-+-+-+  " \
-"   0                   1   " \
-"  + + + + + + + + + + + +  " \
-"                           " \
-"  + + + + + + + + + + + +  " \
-"   2                   3   " \
-"  +-+-+-+-+-+-+-+-+-+-+-+  " \
-"  |                     |  " \
-"  + + + + + + + + + + + +  " \
-" 6| | | | | | | | | | | |7 " \
-"+-+ + + + + + + + + +-+ +-+" \
-" w      |   | |   |      w " \
-"+-+-+ + +-+ + + +-+ + +-+-+" \
-"  |   |             |   |  " \
-"  + + +-+ + + + + +-+ + +  " \
-" 4| |   |   | |   |   | |5 " \
-"  + + + + +-+ +-+ + +-+ +  " \
-"  |   |             |   |  " \
-"  +-+-+-+-+-+-+-+-+-+-+-+  " \
-"   0                   1   " \
-"  + + + + + + + + + + + +  " \
-"                           " \
-"  + + + + + + + + + + + +  " \
-"   2                   3   " \
-"  +-+-+-+-+-+-+-+-+-+-+-+  " \
-"  |                     |  " \
-"  + +-+ +-+-+ +-+-+ +-+ +  " \
-" 6|     |         |     |7 " \
-"+-+ +-+-+ + + + + +-+-+ +-+" \
-" w                       w " \
-"+-+ +-+ + + + + + + +-+ +-+" \
-"  |   |             |   |  " \
-"  + + +-+ +-+-+-+ +-+ + +  " \
-" 4| |                 | |5 " \
-"  + + + + + +-+ + + + + +  " \
-"  |   |   |     |   |   |  " \
-"  +-+-+-+-+-+-+-+-+-+-+-+  " \
-"   0                   1   " \
-"  + + + + + + + + + + + +  " \
-"                           " \
-"  + + + + + + + + + + + +  ";
-
+#include <QFile>
+#include <QTextStream>
+#include "maptile.h"
 Playfield::Playfield(QObject *parent, QList<Character*> &chars) : QObject(parent), _scene(), characters(chars) {
     for(int x=0;x < MAPW;x++)
         for(int y=0;y < MAPH; y++)
             mapTiles[x][y] = 0;
 
-        _scene.setBackgroundBrush(QBrush(QColor("black")));
+    _scene.setBackgroundBrush(QBrush(QColor("black")));
     levelNameItem = new QGraphicsSimpleTextItem(0, &_scene);
     levelNameItem->setBrush(C64Palette::color(2));
     QFont fnt = QFont("Adore64");
     fnt.setPixelSize(6);
     levelNameItem->setFont(fnt);
     levelNameItem->setZValue(1);
-    loadMap(0);
     radar = new Radar(this, characters);
     radar->setPos(TILEW*4+TILEW/2, TILEH*7+8);
     _scene.addItem(radar);
@@ -97,10 +24,18 @@ Playfield::Playfield(QObject *parent, QList<Character*> &chars) : QObject(parent
     patternChangeTimer.setSingleShot(false);
     connect(&patternChangeTimer, SIGNAL(timeout()), this, SLOT(changePattern()));
     setMode(0);
+    mapCount = 0;
+    mapVisible = false;
 }
 
 Playfield::~Playfield() {
     delete levelNameItem;
+}
+
+void Playfield::loadMapData(QString filename) {
+    mapFileName = filename;
+    QFile f(mapFileName);
+    Q_ASSERT(f.exists());
 }
 
 void Playfield::setMapName(QString name) {
@@ -109,88 +44,112 @@ void Playfield::setMapName(QString name) {
 }
 
 void Playfield::loadMap(int num) {
-    setMapName("DUNGEON  " + QString::number(num+1));
-    num = num % 4;
+    QFile mapFile(mapFileName);
+    Q_ASSERT(mapFile.exists());
+    mapFile.open(QIODevice::ReadOnly);
+    QString dataline = mapFile.readLine();
+    mapCount = dataline.left(dataline.indexOf(' ')).toInt();
+    Q_ASSERT(mapCount);
+
     for(int x=0;x < MAPW;x++) {
         for(int y=0;y < MAPH; y++) {
-            if(mapTiles[x][y]) {
-                delete(mapTiles[x][y]);
+            MapTile *mt = tileAt(x,y);
+            if(mt) {
+                delete(mt);
                 mapTiles[x][y] = 0;
             }
         }
     }
     warpTiles.clear();
     spawnPoints.clear();
-    for(int x=0;x<MAPW;x++) {
-//        QVector<MapTile*> col(MAPH);
-        for(int y=0;y<MAPH;y++) {
-            // First, figure out which walls this tile has:
-            int walls = 0;
-            QString mapqs(mapdata);
-            int rowlength = MAPW * 2 + 1;
-            int tilerow = rowlength + rowlength*(y*2) + (rowlength * num * MAPH * 2);
-            int tile = tilerow + 1 + x*2;
-            //Q_ASSERT(mapdata[tile]==' ' || mapdata[tile]=='s');
-            if(mapdata[tile-1]=='|')
-                walls |= MapTile::MT_W;
-            if(mapdata[tile-rowlength]=='-' && y!=0)
-                walls |= MapTile::MT_N;
+    QString prevLine;
+    int y=0, lineNumber=-1;
+    int loadedMaps=-1;
+    while(mapFile.canReadLine()) {
+        QString line = mapFile.readLine();
+        if(line.startsWith("MAP")) {
+            lineNumber=0;
+            loadedMaps++;
+            qDebug() << Q_FUNC_INFO << "Next map: " << loadedMaps;
+        } else {
+  //          qDebug() << Q_FUNC_INFO << y << (y % 2);
+            if(loadedMaps==num && (lineNumber % 2)) {
+                if(line.endsWith('\n'))
+                    line.chop(1);
+                while(line.length() < MAPW*2+2)
+                    line.append(' ');
+//                qDebug() << Q_FUNC_INFO << "Loading this";
+                qDebug() << Q_FUNC_INFO << "Line:" << line << y;
+                for(int x = 0; x < MAPW; x++) {
+                    QChar mapChar = line.at(1+x*2);
+                    // First, figure out which walls this tile has:
+                    int walls = 0;
 
-            // Ok, walls setup.
-            // Is this a regular or spawn tile?
-            bool isASpawnTile;
-            int spawnNumber = QString(mapdata[tile]).toInt(&isASpawnTile);
-            MapTile *mt = 0;
-            if(mapdata[tile]=='w') { // Warp tile
-                WarpTile *wt = new WarpTile(TilePos(x,y), this);
-                mt = wt;
-                warpTiles.append(wt);
-            } else if(isASpawnTile) {
-                SpawnTile *st = new SpawnTile(TilePos(x,y));
-                mt = st;
-                if(y==0) {
-                    st->setSpawnDirection(MapTile::MT_S);
-                    if(x < MAPW/2) {
-                        st->setLivesPosition(QPointF(TILEW, 0));
-                    } else {
-                        st->setLivesPosition(QPointF(-TILEW, 0));
+                    if(line.at(x*2)=='|')
+                        walls |= MapTile::MT_W;
+
+                    if(!prevLine.isEmpty()) {
+                        if(prevLine.at(1+x*2)=='-')
+                            walls |= MapTile::MT_N;
                     }
-                } else if(y==MAPH-2) {
-                    st->setSpawnDirection(MapTile::MT_N);
-                    if(x < MAPW/2) {
-                        st->setLivesPosition(QPointF(TILEW, 0));
+                    // Ok, walls setup.
+                    // Is this a regular or spawn tile?
+                    bool isASpawnTile;
+                    int spawnNumber = QString(mapChar).toInt(&isASpawnTile);
+                    MapTile *mt = 0;
+                    if(mapChar=='w') { // Warp tile
+                        WarpTile *wt = new WarpTile(TilePos(x,y), this);
+                        mt = wt;
+                        warpTiles.append(wt);
+                    } else if(isASpawnTile) {
+                        SpawnTile *st = new SpawnTile(TilePos(x,y));
+                        mt = st;
+                        if(y==0) {
+                            st->setSpawnDirection(MapTile::MT_S);
+                            if(x < MAPW/2) {
+                                st->setLivesPosition(QPointF(TILEW, 0));
+                            } else {
+                                st->setLivesPosition(QPointF(-TILEW, 0));
+                            }
+                        } else if(y==MAPH-1) {
+                            st->setSpawnDirection(MapTile::MT_N);
+                            if(x < MAPW/2) {
+                                st->setLivesPosition(QPointF(TILEW, 0));
+                            } else {
+                                st->setLivesPosition(QPointF(-TILEW, 0));
+                            }
+                        } else if(x < MAPW/2) {
+                            st->setSpawnDirection(MapTile::MT_E);
+                            if(y < MAPH/2) {
+                                st->setLivesPosition(QPointF(0, -TILEH));
+                            } else {
+                                st->setLivesPosition(QPointF(0, TILEH));
+                            }
+                        } else if(x >= MAPW/2) {
+                            st->setSpawnDirection(MapTile::MT_W);
+                            if(y < MAPH/2) {
+                                st->setLivesPosition(QPointF(0, -TILEH));
+                            } else {
+                                st->setLivesPosition(QPointF(0, TILEH));
+                            }
+                        }
+                        spawnPoints[spawnNumber] = st;
                     } else {
-                        st->setLivesPosition(QPointF(-TILEW, 0));
+                        mt = new MapTile(TilePos(x,y));
                     }
-                } else if(x < MAPW/2) {
-                    st->setSpawnDirection(MapTile::MT_E);
-                    if(y < MAPH/2) {
-                        st->setLivesPosition(QPointF(0, -TILEH));
-                    } else {
-                        st->setLivesPosition(QPointF(0, TILEH));
-                    }
-                } else if(x >= MAPW/2) {
-                    st->setSpawnDirection(MapTile::MT_W);
-                    if(y < MAPH/2) {
-                        st->setLivesPosition(QPointF(0, -TILEH));
-                    } else {
-                        st->setLivesPosition(QPointF(0, TILEH));
-                    }
+                    mt->setWalls(walls);
+                    if(mapChar=='s') mt->setContent(MapTile::MT_CONTENT_SAND);
+
+                    // Add the new tile to table
+                    mapTiles[x][y] = mt;
+                    _scene.addItem(mt);
+                    mt->setPos(mt->coords());
                 }
-
-                spawnPoints[spawnNumber] = st;
-
-            } else {
-                mt = new MapTile(TilePos(x,y));
+                y++;
             }
-            mt->setWalls(walls);
-
-            // Add the new tile to table
-            mapTiles[x][y] = mt;
-            _scene.addItem(mt);
-            mt->setPos(mt->coords());
+            lineNumber++;
+            prevLine = line;
         }
-//        mapTiles.append(col);
     }
     // Set the neighbor pointers
     for(int x=0;x<MAPW;x++) {
@@ -210,11 +169,17 @@ void Playfield::loadMap(int num) {
             mapTiles[x][y]->setNeightbors(n, s, w, e);
         }
     }
+    Q_ASSERT(num < mapCount);
+    setMapName("DUNGEON  " + QString::number(num+1));
+    num = num % mapCount;
     // Set warp targets
     if(warpTiles.size()==2) {
         warpTiles[0]->setTarget(warpTiles[1]);
         warpTiles[1]->setTarget(warpTiles[0]);
     }
+    Q_ASSERT(!spawnPoints.isEmpty());
+    setMode(mode);
+    setVisible(mapVisible);
 }
 
 QGraphicsScene* Playfield::scene() {
@@ -235,10 +200,17 @@ MapTile * Playfield::tileAt(TilePos coords) {
     return mapTiles[coords.x()][coords.y()];
 }
 
+MapTile *Playfield::tileAt(int x, int y) {
+    return tileAt(TilePos(x,y));
+}
+
 void Playfield::setVisible(bool visible) {
+    mapVisible = visible;
     for(int x=0;x < MAPW;x++) {
         for(int y=0;y < MAPH; y++) {
-            mapTiles[x][y]->setVisible(visible);
+            MapTile *mt = tileAt(x,y);
+            if(mt)
+                mt->setVisible(visible);
         }
     }
     levelNameItem->setVisible(visible);
@@ -292,16 +264,18 @@ void Playfield::setMode(int m) {
     } else {
         patternChangeTimer.start();
     }
-    for(int x=0;x<MAPW;x++)
+    for(int x=0;x<MAPW;x++) {
         for(int y=0;y<MAPH;y++) {
             MapTile *mt = tileAt(QPoint(x,y));
-            mt->setMode(m);
+            if(mt)
+                mt->setMode(m);
         }
+    }
 }
 
 MapTile *Playfield::randomTile(bool notCloseToCharacters) {
     int x = 1+qrand() % (MAPW-2);
-    int y = 1+qrand() % (MAPH-3);
+    int y = 1+qrand() % (MAPH-2);
     if(notCloseToCharacters) {
         for(int minRange = 4; minRange >0;minRange--) {
             bool posOk = true;
@@ -316,7 +290,7 @@ MapTile *Playfield::randomTile(bool notCloseToCharacters) {
             if(posOk)
                 return tileAt(TilePos(x,y));
             x = 1+qrand() % (MAPW-2);
-            y = 1+qrand() % (MAPH-3);
+            y = 1+qrand() % (MAPH-2);
         }
     }
     return tileAt(TilePos(x,y));
@@ -347,7 +321,7 @@ void Playfield::updateContent()
 bool Playfield::tileIsValidLocation(MapTile *mt) {
     bool isValid = true;
     if(!mt)
-        isValid = false;
+        return false;
     if(mt->position().x()<=0 || mt->position().x() > MAPW-1)
         isValid = false;
     if(mt->position().y()<=0 || mt->position().y() > MAPH-1)

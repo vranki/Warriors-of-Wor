@@ -30,6 +30,7 @@ void GameModeClassic::killAllEnemies() {
 void GameModeClassic::initGame(Playfield *f, SamplePlayer *s) {
     field = f;
     samples = s;
+    field->loadMapData("maps_wow.txt");
 }
 
 QString GameModeClassic::name() {

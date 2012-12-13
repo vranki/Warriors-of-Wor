@@ -9,6 +9,7 @@ GameModeBomberman::GameModeBomberman(QObject *parent, QList<Character*> &plrs) :
 void GameModeBomberman::initGame(Playfield *f, SamplePlayer *s) {
     field = f;
     samples = s;
+    field->loadMapData("maps_bomberman.txt");
 }
 
 QString GameModeBomberman::name()

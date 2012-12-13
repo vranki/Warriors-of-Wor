@@ -83,3 +83,7 @@ HEADERS  += mainwindow.h \
     bomb.h
 
 FORMS    += mainwindow.ui
+
+OTHER_FILES += \
+    maps_wow.txt \
+    maps_bomberman.txt

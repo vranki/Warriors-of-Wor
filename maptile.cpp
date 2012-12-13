@@ -74,6 +74,13 @@ MapTile::MapTile(TilePos newPos) : QObject(), QGraphicsItem() {
     fireItem.setParentItem(this);
     fireItem.setZValue(-20);
     fireItem.setVisible(false);
+
+    sandPixmap = Sprite::loadBitmap("wow-sprites/sand.bmp", C64Palette::color(9));
+    sandItem.setParentItem(this);
+    sandItem.setZValue(20);
+    sandItem.setVisible(false);
+    sandItem.setPixmap(sandPixmap);
+
     setMode(0);
 }
 
@@ -128,6 +135,15 @@ MapTile *MapTile::tileTo(QPoint dir) {
     if(dir.y() > 0) return s();
     if(dir.y() < 0) return n();
     return 0;
+}
+
+bool MapTile::canWalkTo(QPoint dir) {
+    MapTile *otherTile = tileTo(dir);
+    if(!otherTile) return false;
+    if(otherTile->content() & MT_CONTENT_SAND ||
+            otherTile->content() & MT_CONTENT_BLOCK )
+        return false;
+    return true;
 }
 
 QPoint MapTile::position() {
@@ -233,4 +249,5 @@ void MapTile::updateFireTile()
     } else {
         fireItem.setVisible(false);
     }
+    sandItem.setVisible(content() & MT_CONTENT_SAND);
 }

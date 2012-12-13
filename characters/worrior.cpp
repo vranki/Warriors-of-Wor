@@ -33,7 +33,8 @@ void Worrior::setDirection(QPoint dir) {
 }
 
 void Worrior::resetCharacter() {
-    setPos(playfield->spawnPoint(playerNumber)->pos());
+    if(playfield->spawnPoint(playerNumber))
+        setPos(playfield->spawnPoint(playerNumber)->pos());
     spawned = false;
     spawned = false;
     canspawn = false;

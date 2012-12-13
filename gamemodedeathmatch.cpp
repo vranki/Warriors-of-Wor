@@ -13,6 +13,7 @@ GameModeDeathmatch::GameModeDeathmatch(QObject *parent, QList<Character*> &plrs)
 void GameModeDeathmatch::initGame(Playfield *f, SamplePlayer *s) {
     field = f;
     samples = s;
+    field->loadMapData("maps_wow.txt");
 }
 
 QString GameModeDeathmatch::name() {

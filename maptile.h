@@ -12,7 +12,7 @@
 
 typedef QPoint TilePos;
 #define MAPW 13
-#define MAPH 9
+#define MAPH 8
 #define TILEW 24
 #define TILEH 24
 #define WALLW 2
@@ -39,6 +39,7 @@ public:
     void setNeightbors(MapTile *nn, MapTile *ns, MapTile *nw, MapTile *ne);
     MapTile *tileTo(int dir);
     MapTile *tileTo(QPoint dir);
+    bool canWalkTo(QPoint dir);
     MapTile *n();
     MapTile *e();
     MapTile *w();
@@ -64,8 +65,8 @@ private:
     MapTile *mn, *ms, *mw, *me;
     bool highlight;
     int _walls;
-    QGraphicsPixmapItem np, wp, fireItem;
-    QPixmap *nPixmap[6], *wPixmap[6], fireCenterPixmap, fireHorizontalPixmap, fireVerticalPixmap;
+    QGraphicsPixmapItem np, wp, fireItem, sandItem;
+    QPixmap *nPixmap[6], *wPixmap[6], fireCenterPixmap, fireHorizontalPixmap, fireVerticalPixmap, sandPixmap;
     int mode; // 0=normal, 1=worluk, 2=wizard
     bool swapOtherImage;
     bool fireTile;
