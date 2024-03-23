@@ -1,0 +1,6 @@
+*.o
+.qmake.stash
+wow
+moc_*.cpp
+moc_predefs.h
+ui_mainwindow.h
