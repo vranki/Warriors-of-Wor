@@ -29,8 +29,8 @@ public:
     GameModeClassic(QObject *parent, QList<Character*> &plrs);
     ~GameModeClassic();
     virtual void initGame(Playfield *f, SamplePlayer *s);
-    virtual QString name();
-    virtual QString description();
+    virtual QString name() const;
+    virtual QString description() const;
     virtual void startGame();
     virtual void startRound();
 signals:

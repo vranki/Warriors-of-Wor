@@ -12,12 +12,12 @@ void GameModeBomberman::initGame(Playfield *f, SamplePlayer *s) {
     field->loadMapData("maps_bomberman.txt");
 }
 
-QString GameModeBomberman::name()
+QString GameModeBomberman::name() const
 {
     return "BOMBERMAN";
 }
 
-QString GameModeBomberman::description()
+QString GameModeBomberman::description() const
 {
     return "BLAST THEM AWAY!";
 }

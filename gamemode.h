@@ -11,8 +11,8 @@ class GameMode : public QObject {
 public:
     explicit GameMode(QObject *parent, QList<Character*> &plrs);
     virtual void initGame(Playfield *f, SamplePlayer *s)=0;
-    virtual QString name()=0;
-    virtual QString description()=0;
+    virtual QString name() const =0;
+    virtual QString description() const =0;
     virtual void startGame()=0;
     virtual void startRound()=0;
 signals:
