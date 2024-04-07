@@ -46,6 +46,7 @@ public:
     virtual MapTile *randomTile(bool notCloseToCharacters=false); // On playfield
     void setBackgroundColor(QColor c);
     virtual void updateContent();
+    int getMapCount() const { return mapCount; }
 signals:
 
 public slots:

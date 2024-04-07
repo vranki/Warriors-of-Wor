@@ -23,7 +23,7 @@ GameModeClassic::~GameModeClassic() {
 void GameModeClassic::killAllEnemies() {
     foreach(EnemyCharacter *c, enemyCharacters()) {
         characters.removeOne(c);
-        delete c;
+        c->deleteLater();
     }
 }
 
@@ -130,7 +130,15 @@ void GameModeClassic::nextIntroPhase() {
 void GameModeClassic::startRound() {
     wizard = 0;
     worluk = 0;
-    field->loadMap(gameRound);
+    int newMapToLoad = gameRound;
+    qDebug() << Q_FUNC_INFO << "gameRound:" << gameRound;
+    if (field->getMapCount()) {
+	// data not available prior to reading maps
+        qDebug() << Q_FUNC_INFO << "field->getMapCount():" << field->getMapCount();
+        newMapToLoad = gameRound % field->getMapCount();
+    }
+    qDebug() << "Computed newMapToLoad as " << newMapToLoad;
+    field->loadMap( newMapToLoad );
     if(gameRound==0) field->setMapName("RADAR");
     field->setVisible(true);
     foreach(Character *c, characters) {
@@ -182,7 +190,7 @@ The Wizard remains in the dungeon until he shoots a Worrior or is killed.
 Killing the Wizard of Wor will also create a double score dungeon for the next dungeon.
 */
 void GameModeClassic::characterKilled() {
-    qDebug() << Q_FUNC_INFO;
+    qDebug() << Q_FUNC_INFO << "characters.size(): " << characters.size();
     Character *c = qobject_cast<Character*>(sender());
     Q_ASSERT(c);
     Burwor *burwor = qobject_cast<Burwor*>(sender());
