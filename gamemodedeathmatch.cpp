@@ -16,11 +16,11 @@ void GameModeDeathmatch::initGame(Playfield *f, SamplePlayer *s) {
     field->loadMapData("maps_wow.txt");
 }
 
-QString GameModeDeathmatch::name() {
+QString GameModeDeathmatch::name() const {
     return "DEATHMATCH";
 }
 
-QString GameModeDeathmatch::description() {
+QString GameModeDeathmatch::description() const {
     return "Survive deathmatch 3 times to win";
 }
 

@@ -33,11 +33,11 @@ void GameModeClassic::initGame(Playfield *f, SamplePlayer *s) {
     field->loadMapData("maps_wow.txt");
 }
 
-QString GameModeClassic::name() {
+QString GameModeClassic::name() const {
     return "CLASSIC";
 }
 
-QString GameModeClassic::description() {
+QString GameModeClassic::description() const {
     return "Kill all enemies";
 }
 

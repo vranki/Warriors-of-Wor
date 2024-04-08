@@ -10,8 +10,8 @@ class GameModeBomberman : public GameMode
 public:
     explicit GameModeBomberman(QObject *parent, QList<Character*> &plrs);
     virtual void initGame(Playfield *f, SamplePlayer *s);
-    virtual QString name();
-    virtual QString description();
+    virtual QString name() const;
+    virtual QString description() const;
     virtual void startGame();
     virtual void startRound();
 signals:
