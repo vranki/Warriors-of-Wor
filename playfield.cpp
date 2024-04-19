@@ -10,8 +10,9 @@ Playfield::Playfield(QObject *parent, QList<Character*> &chars) : QObject(parent
             mapTiles[x][y] = 0;
 
     _scene.setBackgroundBrush(QBrush(QColor("black")));
-    levelNameItem = new QGraphicsSimpleTextItem(0, &_scene);
+    levelNameItem = new QGraphicsSimpleTextItem(nullptr);
     levelNameItem->setBrush(C64Palette::color(2));
+    _scene.addItem(levelNameItem);
     QFont fnt = QFont("Adore64");
     fnt.setPixelSize(6);
     levelNameItem->setFont(fnt);
@@ -32,18 +33,21 @@ Playfield::~Playfield() {
     delete levelNameItem;
 }
 
-void Playfield::loadMapData(QString filename) {
+int Playfield::loadMapData(const QString& filename) {
     mapFileName = filename;
     QFile f(mapFileName);
+    int r = f.exists();
     Q_ASSERT(f.exists());
+    return !r;
 }
 
-void Playfield::setMapName(QString name) {
+void Playfield::setMapName(const QString& name) {
     levelNameItem->setText(name);
     levelNameItem->setPos(TILEW*5, TILEH*7+3);
 }
 
 void Playfield::loadMap(int num) {
+    //qDebug() << Q_FUNC_INFO << "num:" << num;
     QFile mapFile(mapFileName);
     Q_ASSERT(mapFile.exists());
     mapFile.open(QIODevice::ReadOnly);
@@ -274,25 +278,39 @@ void Playfield::setMode(int m) {
 }
 
 MapTile *Playfield::randomTile(bool notCloseToCharacters) {
+    //qDebug() << Q_FUNC_INFO << "notCloseToCharacters:" << notCloseToCharacters << " characters.size():" << characters.size();
     int x = 1+qrand() % (MAPW-2);
     int y = 1+qrand() % (MAPH-2);
+    //qDebug() << "characters has size " << characters.size();
     if(notCloseToCharacters) {
         for(int minRange = 4; minRange >0;minRange--) {
             bool posOk = true;
             foreach(Character *c, characters) {
-                if(qobject_cast<Player*>(c)) {
-                    int dx = qAbs(x - c->currentTile()->position().x());
-                    int dy = qAbs(y - c->currentTile()->position().y());
+                if (!c) {
+                    //qDebug() << "Error: Character in list is NULL";
+                    continue;
+                }
+                Player *p = qobject_cast<Player*>(c);
+                if(p) {
+                    // successful only if character is a player
+                    //if(!p->getControllable())
+                    //    continue;
+                    int dx = qAbs(x - p->currentTile()->position().x());
+                    int dy = qAbs(y - p->currentTile()->position().y());
                     if(dx < minRange && dy < minRange)
                         posOk = false;
                 }
             }
-            if(posOk)
+            if(posOk) {
+                //qDebug() << "posOK at " << x << y;
                 return tileAt(TilePos(x,y));
+            }
+            //qDebug() << "random position";
             x = 1+qrand() % (MAPW-2);
             y = 1+qrand() % (MAPH-2);
         }
     }
+    //qDebug() << "returning " << x << y;
     return tileAt(TilePos(x,y));
 }
 
