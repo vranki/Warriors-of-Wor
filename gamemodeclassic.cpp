@@ -211,7 +211,7 @@ void GameModeClassic::characterKilled() {
     Q_ASSERT(characters.contains(c));
     characters.removeOne(c);
     //qDebug() << "characterssize(): " << characters.size();
-    delete c;
+    c->deleteLater();
     c = 0;
     QList<EnemyCharacter*> enemies = enemyCharacters();
     if(burwor) {
