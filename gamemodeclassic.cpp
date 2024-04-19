@@ -1,7 +1,9 @@
 #include "gamemodeclassic.h"
 
 GameModeClassic::GameModeClassic(QObject *parent, QList<Character*> &plrs) : GameMode(parent, plrs) {
+    qDebug() << Q_FUNC_INFO;
     gameRound = 0;
+    gameState = GS_Intro;
     monstersSpawned = 0;
     introTimer.setSingleShot(true);
     connect(&introTimer, SIGNAL(timeout()), this, SLOT(nextIntroPhase()));
@@ -17,10 +19,12 @@ GameModeClassic::GameModeClassic(QObject *parent, QList<Character*> &plrs) : Gam
 }
 
 GameModeClassic::~GameModeClassic() {
+    qDebug() << Q_FUNC_INFO;
     killAllEnemies();
 }
 
 void GameModeClassic::killAllEnemies() {
+    qDebug() << Q_FUNC_INFO;
     foreach(EnemyCharacter *c, enemyCharacters()) {
         characters.removeOne(c);
         c->deleteLater();
@@ -28,6 +32,7 @@ void GameModeClassic::killAllEnemies() {
 }
 
 void GameModeClassic::initGame(Playfield *f, SamplePlayer *s) {
+    qDebug() << Q_FUNC_INFO;
     field = f;
     samples = s;
     field->loadMapData("maps_wow.txt");
@@ -69,8 +74,10 @@ void GameModeClassic::nextIntroPhase() {
 
     if(introPhase==1) { // Getready
         Q_ASSERT(!getready);
-        getready = new QGraphicsPixmapItem(0, field->scene());
-        getready->setPixmap(QPixmap("wow-sprites/getready.png"));
+        QPixmap pixmap("wow-sprites/getready.png");
+        getready = new QGraphicsPixmapItem(pixmap);
+        field->scene()->addItem(getready);
+        getready->setPixmap(pixmap) ;
         getready->setZValue(100);
         samples->stopbackground();
         samples->introLong2();
@@ -78,50 +85,54 @@ void GameModeClassic::nextIntroPhase() {
     } else if(introPhase==2) { // Go
         Q_ASSERT(getready);
         if(doubleScoreDungeon) {
-            delete getready;
-            getready = 0;
+            if (getready) delete getready;
+            getready = nullptr;
             Q_ASSERT(!dsd);
-            dsd = new QGraphicsPixmapItem(0, field->scene());
-            dsd->setPixmap(QPixmap("wow-sprites/doublescoredungeon.png"));
+            QPixmap pixmap("wow-sprites/doublescoredungeon.png");
+            dsd = new QGraphicsPixmapItem(pixmap);
+            field->scene()->addItem(dsd);
+            dsd->setPixmap(pixmap) ;
             dsd->setZValue(100);
             field->setVisible(false);
             foreach(Character *c, characters)
                 c->setVisible(false);
         } else {
             Q_ASSERT(!go);
-            go = new QGraphicsPixmapItem(0, field->scene());
-            go->setPixmap(QPixmap("wow-sprites/go.png"));
+            QPixmap pixmap("wow-sprites/go.png");
+            go = new QGraphicsPixmapItem(pixmap);
+            field->scene()->addItem(go);
             go->setZValue(100);
         }
         if(bonusPlayerGiven) {
             Q_ASSERT(!bonusPlayer);
-            bonusPlayer = new QGraphicsPixmapItem(0, field->scene());
-            bonusPlayer->setPixmap(QPixmap("wow-sprites/bonus_player.png"));
+            QPixmap pixmap("wow-sprites/bonus_player.png");
+            bonusPlayer = new QGraphicsPixmapItem(pixmap);
             bonusPlayer->setZValue(100);
+            field->scene()->addItem(bonusPlayer);
             bonusPlayerGiven = false;
         }
         introTimer.start(4000);
     } else if(introPhase==3) {
         if(getready) {
             delete getready;
-            getready = 0;
+            getready = nullptr;
         }
         if(go) {
             delete go;
-            go = 0;
+            go = nullptr;
         }
         if(dsd) {
             delete dsd;
-            dsd = 0;
+            dsd = nullptr;
         }
         if(bonusPlayer) {
             delete bonusPlayer;
-            bonusPlayer = 0;
+            bonusPlayer = nullptr;
         }
         field->setVisible(true);
         foreach(Character *c, characters)
             c->setVisible(true);
-        getready = go = dsd = bonusPlayer = 0;
+        getready = go = dsd = bonusPlayer = nullptr;
         introPhase = 0;
         startRound();
     }
@@ -134,10 +145,10 @@ void GameModeClassic::startRound() {
     qDebug() << Q_FUNC_INFO << "gameRound:" << gameRound;
     if (field->getMapCount()) {
 	// data not available prior to reading maps
-        qDebug() << Q_FUNC_INFO << "field->getMapCount():" << field->getMapCount();
+        //qDebug() << Q_FUNC_INFO << "field->getMapCount():" << field->getMapCount();
         newMapToLoad = gameRound % field->getMapCount();
     }
-    qDebug() << "Computed newMapToLoad as " << newMapToLoad;
+    //qDebug() << "Computed newMapToLoad as " << newMapToLoad;
     field->loadMap( newMapToLoad );
     if(gameRound==0) field->setMapName("RADAR");
     field->setVisible(true);
@@ -190,7 +201,7 @@ The Wizard remains in the dungeon until he shoots a Worrior or is killed.
 Killing the Wizard of Wor will also create a double score dungeon for the next dungeon.
 */
 void GameModeClassic::characterKilled() {
-    qDebug() << Q_FUNC_INFO << "characters.size(): " << characters.size();
+    //qDebug() << Q_FUNC_INFO << "characters.size(): " << characters.size();
     Character *c = qobject_cast<Character*>(sender());
     Q_ASSERT(c);
     Burwor *burwor = qobject_cast<Burwor*>(sender());
@@ -199,15 +210,19 @@ void GameModeClassic::characterKilled() {
 
     Q_ASSERT(characters.contains(c));
     characters.removeOne(c);
-    delete c;
+    //qDebug() << "characterssize(): " << characters.size();
+    c->deleteLater();
     c = 0;
     QList<EnemyCharacter*> enemies = enemyCharacters();
     if(burwor) {
+        //qDebug() << Q_FUNC_INFO << "Detected death of burwor";
         if(garwors < gameRound && enemies.size()<gameRound)
             spawnNewGarwor();
     } else if(garwor) {
+        //qDebug() << Q_FUNC_INFO << "Detected death of garwor";
         spawnNewThorwor();
     } else if(worluk) {
+        qDebug() << Q_FUNC_INFO << "Detected death of worluk";
         samples->stopbackground();
         worlukKilled = true;
         worluk = 0;
@@ -215,18 +230,26 @@ void GameModeClassic::characterKilled() {
         worlukKilledTimer.start();
         field->setMode(1);
     } else if(wizard) {
+        //qDebug() << Q_FUNC_INFO << "Detected death of wizard";
         wizard = 0;
         field->setMode(2);
         wizardKilledTimer.start();
         setGameState(GS_WizardDeath);
     }
     if(enemyCharacters().isEmpty() && gameState == GS_Normal) {
+#define SPAWN_WORLUK_AND_WIZARD
+#ifdef SPAWN_WORLUK_AND_WIZARD
+        qDebug() << Q_FUNC_INFO << "No more enemies, triggering worluk";
         setGameState(GS_Worluk);
-
+#else
+        qDebug() << Q_FUNC_INFO << "No more enemies, configured to skip worluk/wizard";
+        setGameState(GS_Intro);
+#endif
     }
 }
 
 QList<EnemyCharacter*> GameModeClassic::enemyCharacters() {
+    //qDebug() << Q_FUNC_INFO << "characters.size():" << characters.size();
     QList<EnemyCharacter*> enemies;
     foreach(Character *c, characters) {
         EnemyCharacter *ec = qobject_cast<EnemyCharacter*>(c);
@@ -240,7 +263,7 @@ QList<EnemyCharacter*> GameModeClassic::enemyCharacters() {
 
 
 void GameModeClassic::awardBonusPlayer() {
-    qDebug() << Q_FUNC_INFO;
+    //qDebug() << Q_FUNC_INFO;
     bonusPlayerGiven = true;
     foreach(Character *c, characters) {
         Player *p = qobject_cast<Player*>(c);
@@ -251,26 +274,46 @@ void GameModeClassic::awardBonusPlayer() {
 }
 
 void GameModeClassic::spawnNewBurwor() {
+    //qDebug() << Q_FUNC_INFO << "characters.size(): " << characters.size();
     Burwor *bw = new Burwor(this, field, samples);
+    if (!bw) {
+        qDebug() << "Could not create Burwor.";
+        abort();
+    }
     setupNewEnemy(bw);
     burwors++;
 }
 
 void GameModeClassic::spawnNewGarwor() {
-    Garwor *bw = new Garwor(this, field, samples);
-    setupNewEnemy(bw);
+    //qDebug() << Q_FUNC_INFO << "characters.size(): " << characters.size();
+    Garwor *gw = new Garwor(this, field, samples);
+    if (!gw) {
+        qDebug() << "Could not create Garwor.";
+        abort();
+    }
+    setupNewEnemy(gw);
     garwors++;
 }
 
 void GameModeClassic::spawnNewThorwor() {
+    //qDebug() << Q_FUNC_INFO << "characters.size(): " << characters.size();
     Thorwor *tw = new Thorwor(this, field, samples);
+    if (!tw) {
+        qDebug() << "Could not create Thorwor.";
+        abort();
+    }
     setupNewEnemy(tw);
     thorwors++;
 }
 
 void GameModeClassic::spawnWorluk() {
+    qDebug() << Q_FUNC_INFO << "characters.size(): " << characters.size();
     Q_ASSERT(enemyCharacters().isEmpty());
     worluk = new Worluk(this, field, samples);
+    if (!worluk) {
+        qDebug() << "Could not create worluk.";
+        abort();
+    }
     setupNewEnemy(worluk);
     connect(worluk, SIGNAL(enteredWarp()), this, SLOT(worlukEscaped()));
     field->setMode(true);
@@ -280,8 +323,13 @@ void GameModeClassic::spawnWorluk() {
 }
 
 void GameModeClassic::spawnWizard() {
+    qDebug() << Q_FUNC_INFO << "characters.size(): " << characters.size();
     Q_ASSERT(enemyCharacters().isEmpty());
     wizard = new Wizard(this, field, samples);
+    if (!wizard) {
+        qDebug() << "Could not create wizard.";
+        abort();
+    }
     setupNewEnemy(wizard);
     field->setMode(false);
     field->setMapName("WIZARD OF WOR");
@@ -290,19 +338,36 @@ void GameModeClassic::spawnWizard() {
 }
 
 void GameModeClassic::setupNewEnemy(EnemyCharacter *c) {
+    //qDebug() << Q_FUNC_INFO << "characters.size(): " << characters.size();
+    if (!c) {
+        qDebug() << "setupNewEnemy EnemyCharacter is NULL";
+        return;
+    }
+    //qDebug() << "setupNewEnemy: connecting signal";
     connect(c, SIGNAL(killed()), this, SLOT(characterKilled()));
+    //qDebug() << "setupNewEnemy: connected";
+    //qDebug() << "characters.size(): " << characters.size();
     c->resetCharacter();
-    c->setPos(field->randomTile(true)->pos());
+    //qDebug() << "characters.size(): " << characters.size();
+    //qDebug() << "setupNewEnemy: setting position";
+    MapTile *mt = field->randomTile(true);
+    c->setPos(mt->pos());
+    //qDebug() << "setupNewEnemy: let it be visible";
     c->setVisible(true);
+    //qDebug() << "setupNewEnemy: and it shall be controllable";
     c->setControllable(true);
+    //qDebug() << "setupNewEnemy: adding item to scene";
     field->scene()->addItem(c);
+    //qDebug() << "characters.size(): " << characters.size();
     characters.append(c);
     c->setDirection(QPoint(-1,0));
     c->setSpeedScale(1.0f+((float)gameRound)/4.0f);
     monstersSpawned++;
+    //qDebug() << Q_FUNC_INFO << "done, now with " << monstersSpawned << " monsters.";
 }
 
 void GameModeClassic::worlukEscaped() {
+    qDebug() << Q_FUNC_INFO << "worlukEscaped";
     Q_ASSERT(enemyCharacters().size()==1 && worluk);
     Q_ASSERT(characters.removeOne(worluk));
     worluk->deleteLater();
@@ -314,17 +379,18 @@ void GameModeClassic::worlukEscaped() {
 }
 
 void GameModeClassic::playerKilled() {
+    qDebug() << Q_FUNC_INFO << " with gameState " << gameState;
     if(gameState == GS_Worluk || gameState== GS_Wizard) {
         if(worluk) {
             characters.removeOne(worluk);
             worluk->deleteLater();
-            worluk = 0;
+            worluk = nullptr;
             field->setMode(false);
         }
         if(wizard) {
             characters.removeOne(wizard);
             wizard->deleteLater();
-            wizard = 0;
+            wizard = nullptr;
         }
         samples->stopbackground();
         setGameState(GS_Intro);
@@ -332,6 +398,7 @@ void GameModeClassic::playerKilled() {
 }
 
 void GameModeClassic::worlukKilledBlink() {
+    qDebug() << Q_FUNC_INFO ;
     static int blinkCount = 0;
     blinkCount++;
     if(blinkCount%2== 0) {
@@ -352,6 +419,7 @@ void GameModeClassic::worlukKilledBlink() {
 }
 
 void GameModeClassic::wizardKilledBlink() {
+    qDebug() << Q_FUNC_INFO ;
     wizardKilledTimer.stop();
     setGameState(GS_Intro);
     nextIntroPhase();
@@ -359,36 +427,40 @@ void GameModeClassic::wizardKilledBlink() {
 
 void GameModeClassic::setGameState(GameState newState) {
     GameState oldState = gameState;
+    qDebug() << Q_FUNC_INFO << "oldState:" << oldState << " -> newState:" << newState << " for gameRound:" << gameRound;
     gameState = newState;
     if(gameState==GS_Intro) {
-        qDebug() << Q_FUNC_INFO << "Intro";
+        //qDebug() << Q_FUNC_INFO << "Intro";
         Q_ASSERT(enemyCharacters().isEmpty());
         nextIntroPhase();
     } else if(gameState==GS_Normal) {
         Q_ASSERT(oldState == GS_Intro);
         Q_ASSERT(enemyCharacters().isEmpty());
-        qDebug() << Q_FUNC_INFO << "Normal";
-        if(gameRound==3 || gameRound == 12 || gameRound == 19 || gameRound == 27 || gameRound == 39)
+        //qDebug() << Q_FUNC_INFO << "Normal";
+        if( gameRound==3 || gameRound == 12 || gameRound == 19 || gameRound == 27 || gameRound == 39) {
             awardBonusPlayer();
+        }
         monstersSpawned = burwors = garwors = thorwors = 0;
         worlukKilled = false;
+        //qDebug() << "About to spawn " << ENEMY_COUNT << " new enemies.";
         for(int i=0;i<ENEMY_COUNT;i++)
             spawnNewBurwor();
+        //qDebug() << "All new enemies created.";
         setPlayersControllable(true);
     } else if(gameState==GS_Worluk) {
-        qDebug() << Q_FUNC_INFO << "Worluk";
+        //qDebug() << Q_FUNC_INFO << "Worluk";
         Q_ASSERT(enemyCharacters().isEmpty());
         worlukKilled = false;
         spawnWorluk();
     } else if(gameState==GS_WorlukDeath) {
-        qDebug() << Q_FUNC_INFO << "WorlukDeath";
+        //qDebug() << Q_FUNC_INFO << "WorlukDeath";
         setPlayersControllable(false);
     } else if(gameState==GS_Wizard) {
-        qDebug() << Q_FUNC_INFO << "Wizard";
+        //qDebug() << Q_FUNC_INFO << "Wizard";
         Q_ASSERT(enemyCharacters().isEmpty());
         spawnWizard();
     } else if(gameState==GS_WizardDeath) {
-        qDebug() << Q_FUNC_INFO << "WizardDeath";
+        //qDebug() << Q_FUNC_INFO << "WizardDeath";
         setPlayersControllable(false);
     } else {
         Q_ASSERT(false);

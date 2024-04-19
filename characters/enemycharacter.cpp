@@ -11,7 +11,7 @@ EnemyCharacter::EnemyCharacter(QObject *parent, PlayfieldInfo *pfinfo, SamplePla
 
 void EnemyCharacter::tick(float dt) {
     Character::tick(dt);
-    if(xaligned && yaligned) {
+    if(xaligned && yaligned) { // initialized in constructor of character to false
         QPoint cd = controlDir;
         MapTile* mt = playfield->tileAt(pos() + QPointF(TILEW/2, TILEH/2));
         Q_ASSERT(mt);

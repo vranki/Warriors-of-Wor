@@ -33,12 +33,12 @@ public:
     virtual void tick(float dt);
     MapTile *currentTile();
     QRectF boundingRect() const;
-    QColor color();
+    QColor color() const;
     bool killsPlayer, isEnemy;
     void setCharacterSpeed(float spd);
-    QPointF direction();
+    QPointF direction() const;
     void setWeaponType(WeaponType newWeaponType);
-    WeaponType weaponType();
+    WeaponType weaponType() const;
 public slots:
     virtual void animationTimeout();
     virtual void setDirection(QPoint dir);
@@ -48,6 +48,7 @@ public slots:
     void makeVulnerable();
     void warpTileLeft();
     void setControllable(bool ctrlable);
+    bool getControllable() const {return controllable;};
     void killCharacter(bool blinkfirst);
     virtual void fireWeapon();
     void lazorDestroyed();

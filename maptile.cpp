@@ -98,29 +98,29 @@ void MapTile::setNeightbors(MapTile *nn, MapTile *ns, MapTile *nw, MapTile *ne) 
     me = ne;
 }
 
-MapTile *MapTile::n() {
+MapTile *MapTile::n() const {
     if(_walls & MT_N) return 0;
     return mn;
 }
 
-MapTile *MapTile::e() {
+MapTile *MapTile::e() const {
     if(!me) return 0;
     if(me->walls() & MT_W) return 0;
     return me;
 }
 
-MapTile *MapTile::w() {
+MapTile *MapTile::w() const {
     if(_walls & MT_W) return 0;
     return mw;
 }
 
-MapTile *MapTile::s() {
+MapTile *MapTile::s() const {
     if(!ms) return 0;
     if(ms->walls() & MT_N) return 0;
     return ms;
 }
 
-MapTile *MapTile::tileTo(int dir) {
+MapTile *MapTile::tileTo(const int dir) const {
     if(dir==MT_N) return n();
     if(dir==MT_S) return s();
     if(dir==MT_W) return w();
@@ -129,7 +129,7 @@ MapTile *MapTile::tileTo(int dir) {
 }
 
 
-MapTile *MapTile::tileTo(QPoint dir) {
+MapTile *MapTile::tileTo(const QPoint& dir) const {
     if(dir.x() > 0) return e();
     if(dir.x() < 0) return w();
     if(dir.y() > 0) return s();
@@ -137,7 +137,7 @@ MapTile *MapTile::tileTo(QPoint dir) {
     return 0;
 }
 
-bool MapTile::canWalkTo(QPoint dir) {
+bool MapTile::canWalkTo(const QPoint& dir) const {
     MapTile *otherTile = tileTo(dir);
     if(!otherTile) return false;
     if(otherTile->content() & MT_CONTENT_SAND ||
@@ -146,11 +146,11 @@ bool MapTile::canWalkTo(QPoint dir) {
     return true;
 }
 
-QPoint MapTile::position() {
+QPoint MapTile::position() const {
     return myPos;
 }
 
-QPointF MapTile::coords() {
+QPointF MapTile::coords() const {
     return QPointF(myPos.x()*TILEW, myPos.y()*TILEH);
 }
 
@@ -170,7 +170,7 @@ void MapTile::setHighlight(bool hl) {
     update();
 }
 
-int MapTile::walls() {
+int MapTile::walls() const {
     return _walls;
 }
 
@@ -201,7 +201,7 @@ void MapTile::setContent(int newContent)
     }
 }
 
-int MapTile::content()
+int MapTile::content() const
 {
     return tileContent;
 }

@@ -42,8 +42,13 @@ MainWindow::~MainWindow() {
         gameMode->deleteLater();
 }
 
+static float dt = 0;
 void MainWindow::loopTimeout() {
-    float dt = time.elapsed() / 1000.0;
+    dt = time.elapsed() / 1000.0;
+    if (dt < 0) {
+        fprintf(stderr,"MaiWindow::loopTimeout(): dt < 0\n");
+        abort();
+    }
     time.restart();
     if(dt > 100) dt = 100; // Limit speed on really slow FPS
     foreach(Character *p, characters)

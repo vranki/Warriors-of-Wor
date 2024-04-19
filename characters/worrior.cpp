@@ -3,6 +3,7 @@
 Worrior::Worrior(QObject *parent, PlayfieldInfo *pfinfo, SamplePlayer *smp, QColor color, int playerNum) :
     Character(parent, pfinfo, smp)
 {
+    //qDebug() << Q_FUNC_INFO << "PlayerNumer: " << playerNum;
     playerNumber = playerNum;
     myColor = color;
     animationPixmaps.append(loadBitmap("wow-sprites/spr2E9E.bmp", myColor));
@@ -33,6 +34,7 @@ void Worrior::setDirection(QPoint dir) {
 }
 
 void Worrior::resetCharacter() {
+    //qDebug() << Q_FUNC_INFO << "PlayerNumer: " << playerNumber;
     if(playfield->spawnPoint(playerNumber))
         setPos(playfield->spawnPoint(playerNumber)->pos());
     spawned = false;

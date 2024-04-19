@@ -25,7 +25,7 @@ class Playfield : public QObject, public PlayfieldInfo
 public:
     explicit Playfield(QObject *parent, QList<Character*> &chars);
     ~Playfield();
-    void loadMapData(QString filename);
+    int loadMapData(const QString& filename);
     void loadMap(int num);
     QGraphicsScene* scene();
     QMap<int, SpawnTile*> spawnPoints;
@@ -40,7 +40,7 @@ public:
     void tick(float dt);
     virtual bool tileContainsPlayer(MapTile *mt);
     virtual bool tileContainsEnemy(MapTile *mt);
-    virtual void setMapName(QString name);
+    virtual void setMapName(const QString& name);
     virtual bool tileIsValidLocation(MapTile *mt);
     void setMode(int m);
     virtual MapTile *randomTile(bool notCloseToCharacters=false); // On playfield

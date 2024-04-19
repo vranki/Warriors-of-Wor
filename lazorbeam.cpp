@@ -19,7 +19,7 @@ LazorBeam::LazorBeam(QObject *parent,
 //    setRect(0,0,10,2);
     if(dir.y()) {
         resetTransform();
-        rotate(90);
+        setRotation(90);
     }
     Q_ASSERT(!dir.isNull());
 }

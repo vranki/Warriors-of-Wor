@@ -17,11 +17,16 @@ Character::Character(QObject *parent,
     animationRate = 5000;
     setCharacterSpeed(50);
     wt = WEAPON_LAZOR;
+    forcedmoveTarget = nullptr;
+    tiles[0] = tiles[1] = nullptr;
+    invulnerable = 0;
+    xaligned = yaligned = false;
 }
 Character::~Character() {
 }
 
 void Character::setCharacterSpeed(float spd) {
+    //qDebug() << Q_FUNC_INFO;
     characterSpeed = spd;
     animationTimer.setInterval(animationRate/(characterSpeed*speedScale));
 }
@@ -247,6 +252,7 @@ void Character::deathBlink() {
 }
 
 void Character::resetCharacter() {
+    //qDebug() << Q_FUNC_INFO;
     tf.reset();
     tiles[0] = tiles[1] = 0;
     spriteDir = QPoint(1,0);
@@ -267,6 +273,7 @@ void Character::resetCharacter() {
 }
 
 void Character::tileEntered(MapTile *mt) {
+    //qDebug() << Q_FUNC_INFO;
     if(!playfield->tileIsValidLocation(mt))
         killCharacter(true);
 
@@ -284,13 +291,14 @@ void Character::tileEntered(MapTile *mt) {
 }
 
 void Character::makeVulnerable() {
+    //qDebug() << Q_FUNC_INFO;
     invulnerable = false;
 }
 
 
 void Character::setControllable(bool ctrlable) {
-    /*    qDebug() << Q_FUNC_INFO << ctrlable;
-    Q_ASSERT(!ctrlable);*/
+    //qDebug() << Q_FUNC_INFO << ctrlable;
+    /*Q_ASSERT(!ctrlable);*/
     controllable = ctrlable;
     if(!controllable)
         animationTimer.stop();
@@ -354,11 +362,11 @@ void Character::lazorDestroyed() {
     lazorBeam = 0;
 }
 
-QColor Character::color() {
+QColor Character::color() const {
     return myColor;
 }
 
-QPointF Character::direction() {
+QPointF Character::direction() const {
     return _direction;
 }
 
@@ -367,7 +375,7 @@ void Character::setWeaponType(Character::WeaponType newWeaponType)
     wt = newWeaponType;
 }
 
-Character::WeaponType Character::weaponType()
+Character::WeaponType Character::weaponType() const
 {
     return wt;
 }
