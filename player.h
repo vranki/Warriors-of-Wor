@@ -19,12 +19,12 @@ public:
                     int controllertype,
                     int controllerid,
                     int plnum);
-    int controllerType();
-    int controllerId();
-    int livesLeft(); // -1 = totally dead
-    int numberOfKills();
-    int number();
-    int numberOfWins();
+    int controllerType() const;
+    int controllerId() const;
+    int livesLeft() const; // -1 = totally dead
+    int numberOfKills() const;
+    int number() const;
+    int numberOfWins() const;
     void setWins(int w);
     void resetPlayer();
     void resetLives();

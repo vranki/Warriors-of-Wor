@@ -23,15 +23,16 @@ Player::Player(QObject *parent,
     connect(&spawnTimer, SIGNAL(timeout()), this, SLOT(leaveSpawnTile()));
 }
 
-int Player::controllerType() {
+int Player::controllerType() const {
     return ctrlType;
 }
 
-int Player::controllerId() {
+int Player::controllerId() const {
     return ctrlId;
 }
 
 void Player::characterKilled() {
+    //qDebug() << Q_FUNC_INFO;
     lives--;
     playfield->spawnPoint(playerNumber)->setLivesLeft(lives);
     lazorDestroyed();
@@ -47,6 +48,7 @@ void Player::characterKilled() {
 }
 
 void Player::spawnPlayer() {
+    //qDebug() << Q_FUNC_INFO;
     playfield->spawnPoint(playerNumber)->setUsedByPlayer(true);
     playfield->spawnPoint(playerNumber)->setPlayerImage(pixmap());
     playfield->spawnPoint(playerNumber)->setLivesLeft(lives);
@@ -57,35 +59,40 @@ void Player::spawnPlayer() {
     spawnTimer.start(10000);
 }
 
-int Player::livesLeft() {
+int Player::livesLeft() const {
+    //qDebug() << Q_FUNC_INFO;
     return lives;
 }
 
-int Player::number() {
+int Player::number() const {
+    //qDebug() << Q_FUNC_INFO;
     return playerNumber;
 }
 
 void Player::resetLives() {
+    //qDebug() << Q_FUNC_INFO;
     lives = 2;
 }
 
 void Player::addLife() {
+    //qDebug() << Q_FUNC_INFO;
     if(lives < 2) lives++;
 }
 
 void Player::resetPlayer() {
-   resetCharacter();
-   resetLives();
-   kills = 0;
+    //qDebug() << Q_FUNC_INFO;
+    resetCharacter();
+    resetLives();
+    kills = 0;
 }
 
 void Player::lazorHitPlayerCharacterSlot(Character* other) {
     Player *otherPlayer = qobject_cast<Player*> (other);
     kills++;
-    qDebug() << Q_FUNC_INFO << kills;
+    //qDebug() << Q_FUNC_INFO << kills;
 }
 
-int Player::numberOfWins() {
+int Player::numberOfWins() const {
     return wins;
 }
 
