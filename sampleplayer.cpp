@@ -50,14 +50,14 @@ SamplePlayer::~SamplePlayer() {
 void SamplePlayer::loadSample(QString file, gameSample sample) {
     //Load our WAV file from disk
     Mix_Chunk* sound = Mix_LoadWAV(file.toUtf8().data());
+    sounds[sample] = sound;
     if(sound == NULL) {
         qDebug() << Q_FUNC_INFO << "Unable to load WAV file: " << file << Mix_GetError();
-    } else {
-        sounds[sample] = sound;
     }
 }
 
 int SamplePlayer::playSound(gameSample sample, int loops) {
+    //qDebug() << "Playing sample " << sample;
     Mix_Chunk* sound = sounds.value(sample);
     if(!sound) {
         qDebug() << "Can't play sample " << sample;
@@ -68,6 +68,7 @@ int SamplePlayer::playSound(gameSample sample, int loops) {
     if(channel == -1) {
         qDebug() << "Unable to play sample file: " << Mix_GetError();
     }
+    //qDebug() << "Played sample " << sample << " sucessfully.";
     return channel;
 }
 
@@ -136,8 +137,16 @@ int SamplePlayer::worlukDied() {
     return playSound(GS_WORLUKDIED);
 }
 
+int SamplePlayer::worlukEscaped() {
+    return playSound(GS_WORLUKESCAPED);
+}
+
 int SamplePlayer::wizardDied() {
     return playSound(GS_WIZARDDIED);
+}
+
+int SamplePlayer::wizardEscaped() {
+    return playSound(GS_WIZARDESCAPED);
 }
 
 void SamplePlayer::setBackgroundInterval(int ms) {

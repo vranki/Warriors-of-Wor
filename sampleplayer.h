@@ -25,7 +25,9 @@ enum gameSample {
     GS_BACKGROUND_3,
     GS_BACKGROUND_WORLUK,
     GS_WORLUKDIED,
-    GS_WIZARDDIED
+    GS_WIZARDDIED,
+    GS_WIZARDESCAPED,
+    GS_WORLUKESCAPED
 };
 
 class SamplePlayer : public QObject {
@@ -52,6 +54,8 @@ public slots:
     int enemyVisible();
     int worlukDied();
     int wizardDied();
+    int worlukEscaped();
+    int wizardEscaped();
 private slots:
     void nextBgSound();
 private:
