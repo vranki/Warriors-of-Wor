@@ -51,8 +51,8 @@ qmake
 make
 ```
 
-Please inspect the file .github/workflows/c-cpp.yml for the commands
-required to compile on a current release of Debian or Ubuntu.
+Please inspect the file [.github/workflows/c-cpp.yml](https://github.com/vranki/Warriors-of-Wor/blob/master/.github/workflows/c-cpp.yml)
+for the commands required to compile on a current release of Debian or Ubuntu.
 No proper deb or rpm packaging implemented yet, sorry.
 
 ## Portability
