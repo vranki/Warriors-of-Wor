@@ -10,9 +10,9 @@ QT += widgets
 TARGET = wow
 TEMPLATE = app
 CONFIG   += link_pkgconfig
-PKGCONFIG += cwiid sdl
+PKGCONFIG += cwiid sdl2
 
-LIBS += -lSDL_mixer
+LIBS += -lSDL2_mixer
 
 SOURCES += main.cpp\
         mainwindow.cpp \
