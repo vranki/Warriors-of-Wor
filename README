@@ -46,7 +46,8 @@ Install requires dependencies (Qt, SDL_audio, libcwiid, ..)
 qmake
 make
 
-
+Please inspect the file .github/workflows/c-cpp.yml for the commands
+required to compile on a current release of Debian or Ubuntu.
 No proper deb or rpm packaging implemented yet, sorry.
 
 ---
@@ -64,14 +65,25 @@ Patches to build the game on other platforms are welcome.
 Known issues & todo: 
 
  - Performance is not as good as it shoulds, probably because
-sprites are not pre-scaled to game resolution. Needs some
-benchmarking.
+   sprites are not pre-scaled to game resolution. Needs some
+   benchmarking.
  - Original game mode still has some bugs. Deathmatch should work
-pretty well.
+   pretty well.
  - More controller options needed (SDL joystick).
  - CRT rendering - see http://filthypants.blogspot.fi/2011/05/more-emulator-pixel-shaders-crt-updated.html
 
 Patches are welcome (use Github's merge requests if possible!)
+
+---
+
+See also:
+
+Several other implementations of WoW are presented on GitHub that you may want investigate:
+ - https://github.com/dabadab/wizardofwor
+   The reverse engineering one, also offering a series of technical insights.
+   This project was developed completely independly, though.
+ - https://github.com/Sanguinik/KnightOfWor/
+   A Java implementation.
 
 ---
 
