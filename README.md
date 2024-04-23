@@ -1,7 +1,12 @@
-# BOMBERWARRIORS OF WOR
-By Ville Ranki <ville.ranki@iki.fi>
-
-
+<div style="text-align: center;">
+<h1 style="color: red; background-color: black;">
+    <img src="https://raw.githubusercontent.com/vranki/Warriors-of-Wor/master/wow-sprites/spr2E9E.bmp" alt="Player" style="vertical-align: middle;">
+    BOMBERWARRIORS OF WOR
+    <img src="https://raw.githubusercontent.com/vranki/Warriors-of-Wor/master/wow-sprites/spr221E.bmp" alt="Monster" style="vertical-align: middle;">
+</h1>
+by Ville Ranki <ville.ranki@iki.fi>
+</div>
+<p></p>
 BWOW is a remake and enhanced version of Commodore 64's 
 Wizard of Wor game. It supports 3 game modes and up to 8 
 players using Wiimotes.
@@ -75,7 +80,7 @@ Patches are welcome. Use GitHub's merge requests if possible!
 Several other implementations of WoW are presented on GitHub that you may want investigate:
  - https://github.com/dabadab/wizardofwor
    The reverse engineering one, also offering a series of technical insights.
-   This project was developed completely independly, though.
+   BWOW was developed completely independly, though.
  - https://github.com/Sanguinik/KnightOfWor/
    A Java implementation.
 
