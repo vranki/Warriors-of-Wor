@@ -40,13 +40,14 @@ Pairing wiimotes:
  - Use wiimote in horizontal position. Only d-pad and button "1" are used in game.
 
 You can press "K" on keyboard to add a single keyboard player, controlled by
-arrow keys and space to fire. Yes, a second keyboard player is needed:
+arrow keys and space to fire. Yes, a second keyboard player is needed.
 
 ## Compilation
 
 Install requires dependencies (Qt5, SDL_audio, libcwiid, ..)
 
 ```
+sudo apt install libcwiid-dev libsdl2-dev libsdl2-mixer-dev
 qmake
 make
 ```
@@ -65,7 +66,8 @@ Patches to build the game on other platforms are welcome.
 
 ## Known issues & todo
 
- - Performance is not as good as it shoulds, probably because
+ - Qt6 and possibly other modernizations
+ - Performance is not as good as it should, probably because
    sprites are not pre-scaled to game resolution. Needs some
    benchmarking.
  - Original game mode still has some bugs. Deathmatch should work
