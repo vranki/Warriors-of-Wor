@@ -20,6 +20,13 @@ QPixmap Sprite::loadBitmap(QString filename, QColor color) {
     QImage image(filename);
     if(image.isNull()) {
         qDebug() << Q_FUNC_INFO << "Unable to load image " << filename;
+        image = QImage(24, 24, QImage::Format_ARGB32_Premultiplied);
+        image.fill(Qt::transparent);
+        for(int x=4; x < 20; x++) {
+            for(int y=4; y < 20; y++) {
+                image.setPixel(x, y, color.rgba());
+            }
+        }
     }
     image = image.convertToFormat(QImage::Format_ARGB32_Premultiplied);
     for(int x=0;x < image.width();x++) {
@@ -35,10 +42,11 @@ QPixmap Sprite::loadBitmap(QString filename, QColor color) {
             image.setPixel(x, y, pixel.rgba());
         }
     }
-    Q_ASSERT(image.hasAlphaChannel());
     QPixmap sprite = QPixmap::fromImage(image);
-    //Q_ASSERT(sprite.hasAlphaChannel());
-    Q_ASSERT(!sprite.isNull());
+    if(sprite.isNull()) {
+        sprite = QPixmap(24, 24);
+        sprite.fill(color);
+    }
     cache.insert(cacheKey, sprite);
     return sprite;
 }

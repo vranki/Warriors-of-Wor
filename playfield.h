@@ -53,6 +53,9 @@ public slots:
     void changePattern();
 
 private:
+    void clearMap();
+    void buildFallbackMap();
+    void connectMapTiles();
     QGraphicsScene _scene;
 //    QVector<QVector<MapTile*> > mapTiles;
     MapTile *mapTiles[MAPW][MAPH];

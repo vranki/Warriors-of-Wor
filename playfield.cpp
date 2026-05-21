@@ -30,15 +30,19 @@ Playfield::Playfield(QObject *parent, QList<Character*> &chars) : QObject(parent
 }
 
 Playfield::~Playfield() {
+    clearMap();
     delete levelNameItem;
 }
 
 int Playfield::loadMapData(const QString& filename) {
     mapFileName = filename;
     QFile f(mapFileName);
-    int r = f.exists();
-    Q_ASSERT(f.exists());
-    return !r;
+    if(!f.exists()) {
+        qDebug() << Q_FUNC_INFO << "Map file missing, fallback map will be used:" << mapFileName;
+        mapCount = 1;
+        return 1;
+    }
+    return 0;
 }
 
 void Playfield::setMapName(const QString& name) {
@@ -49,23 +53,23 @@ void Playfield::setMapName(const QString& name) {
 void Playfield::loadMap(int num) {
     //qDebug() << Q_FUNC_INFO << "num:" << num;
     QFile mapFile(mapFileName);
-    Q_ASSERT(mapFile.exists());
-    mapFile.open(QIODevice::ReadOnly);
-    QString dataline = mapFile.readLine();
-    mapCount = dataline.left(dataline.indexOf(' ')).toInt();
-    Q_ASSERT(mapCount);
-
-    for(int x=0;x < MAPW;x++) {
-        for(int y=0;y < MAPH; y++) {
-            MapTile *mt = tileAt(x,y);
-            if(mt) {
-                delete(mt);
-                mapTiles[x][y] = 0;
-            }
-        }
+    if(!mapFile.exists() || !mapFile.open(QIODevice::ReadOnly)) {
+        qDebug() << Q_FUNC_INFO << "Unable to open map file, using fallback map:" << mapFileName;
+        buildFallbackMap();
+        return;
     }
-    warpTiles.clear();
-    spawnPoints.clear();
+    QString dataline = mapFile.readLine();
+    const int firstSpace = dataline.indexOf(' ');
+    bool mapCountOk = false;
+    mapCount = (firstSpace >= 0 ? dataline.left(firstSpace) : dataline).toInt(&mapCountOk);
+    if(!mapCountOk || mapCount <= 0) {
+        qDebug() << Q_FUNC_INFO << "Invalid map header, using fallback map:" << dataline;
+        buildFallbackMap();
+        return;
+    }
+    num = num % mapCount;
+
+    clearMap();
     QString prevLine;
     int y=0, lineNumber=-1;
     int loadedMaps=-1;
@@ -155,13 +159,55 @@ void Playfield::loadMap(int num) {
             prevLine = line;
         }
     }
-    // Set the neighbor pointers
+
     for(int x=0;x<MAPW;x++) {
         for(int y=0;y<MAPH;y++) {
-            MapTile *mt, *n, *s, *w, *e;
-            n = s = w = e = 0;
-            mt = mapTiles[x][y];
-            Q_ASSERT(mt);
+            if(!mapTiles[x][y]) {
+                qDebug() << Q_FUNC_INFO << "Incomplete map data, using fallback map";
+                buildFallbackMap();
+                return;
+            }
+        }
+    }
+
+    if(spawnPoints.isEmpty()) {
+        qDebug() << Q_FUNC_INFO << "Map has no spawn points, using fallback map";
+        buildFallbackMap();
+        return;
+    }
+
+    connectMapTiles();
+    setMapName("DUNGEON  " + QString::number(num+1));
+    // Set warp targets
+    if(warpTiles.size()==2) {
+        warpTiles[0]->setTarget(warpTiles[1]);
+        warpTiles[1]->setTarget(warpTiles[0]);
+    }
+    setMode(mode);
+    setVisible(mapVisible);
+}
+
+void Playfield::clearMap() {
+    for(int x=0;x < MAPW;x++) {
+        for(int y=0;y < MAPH; y++) {
+            MapTile *mt = mapTiles[x][y];
+            if(mt) {
+                delete mt;
+                mapTiles[x][y] = 0;
+            }
+        }
+    }
+    warpTiles.clear();
+    spawnPoints.clear();
+}
+
+void Playfield::connectMapTiles() {
+    for(int x=0;x<MAPW;x++) {
+        for(int y=0;y<MAPH;y++) {
+            MapTile *n = 0;
+            MapTile *s = 0;
+            MapTile *w = 0;
+            MapTile *e = 0;
             if(x > 0)
                 w = mapTiles[x-1][y];
             if(x < MAPW-1)
@@ -170,18 +216,59 @@ void Playfield::loadMap(int num) {
                 n = mapTiles[x][y-1];
             if(y < MAPH-1)
                 s = mapTiles[x][y+1];
-            mapTiles[x][y]->setNeightbors(n, s, w, e);
+            if(mapTiles[x][y])
+                mapTiles[x][y]->setNeightbors(n, s, w, e);
         }
     }
-    Q_ASSERT(num < mapCount);
-    setMapName("DUNGEON  " + QString::number(num+1));
-    num = num % mapCount;
-    // Set warp targets
-    if(warpTiles.size()==2) {
-        warpTiles[0]->setTarget(warpTiles[1]);
-        warpTiles[1]->setTarget(warpTiles[0]);
+}
+
+void Playfield::buildFallbackMap() {
+    clearMap();
+    mapCount = 1;
+
+    for(int y=0;y<MAPH;y++) {
+        for(int x=0;x<MAPW;x++) {
+            MapTile *mt = 0;
+            int spawnNumber = -1;
+
+            if(x==2 && y==MAPH-1) spawnNumber = 0;
+            else if(x==MAPW-3 && y==MAPH-1) spawnNumber = 1;
+            else if(x==2 && y==0) spawnNumber = 2;
+            else if(x==MAPW-3 && y==0) spawnNumber = 3;
+            else if(x==0 && y==MAPH-2) spawnNumber = 4;
+            else if(x==MAPW-1 && y==MAPH-2) spawnNumber = 5;
+            else if(x==0 && y==1) spawnNumber = 6;
+            else if(x==MAPW-1 && y==1) spawnNumber = 7;
+
+            if(spawnNumber >= 0) {
+                SpawnTile *st = new SpawnTile(TilePos(x,y));
+                if(y==0)
+                    st->setSpawnDirection(MapTile::MT_S);
+                else if(y==MAPH-1)
+                    st->setSpawnDirection(MapTile::MT_N);
+                else if(x==0)
+                    st->setSpawnDirection(MapTile::MT_E);
+                else
+                    st->setSpawnDirection(MapTile::MT_W);
+                st->setLivesPosition(QPointF(0, -TILEH));
+                spawnPoints[spawnNumber] = st;
+                mt = st;
+            } else {
+                mt = new MapTile(TilePos(x,y));
+                int walls = 0;
+                if(x==0) walls |= MapTile::MT_W;
+                if(y==0) walls |= MapTile::MT_N;
+                mt->setWalls(walls);
+            }
+
+            mapTiles[x][y] = mt;
+            _scene.addItem(mt);
+            mt->setPos(mt->coords());
+        }
     }
-    Q_ASSERT(!spawnPoints.isEmpty());
+
+    connectMapTiles();
+    setMapName("FALLBACK MAP");
     setMode(mode);
     setVisible(mapVisible);
 }
@@ -199,7 +286,7 @@ MapTile * Playfield::tileAt(QPointF coords) {
 }
 
 MapTile * Playfield::tileAt(TilePos coords) {
-    if(coords.x()<0 || coords.x()>MAPW || coords.y()<0 || coords.y()>MAPH)
+    if(coords.x()<0 || coords.x()>=MAPW || coords.y()<0 || coords.y()>=MAPH)
         return 0;
     return mapTiles[coords.x()][coords.y()];
 }
@@ -292,11 +379,14 @@ MapTile *Playfield::randomTile(bool notCloseToCharacters) {
                 }
                 Player *p = qobject_cast<Player*>(c);
                 if(p) {
+                    MapTile *playerTile = p->currentTile();
+                    if(!playerTile)
+                        continue;
                     // successful only if character is a player
                     //if(!p->getControllable())
                     //    continue;
-                    int dx = qAbs(x - p->currentTile()->position().x());
-                    int dy = qAbs(y - p->currentTile()->position().y());
+                    int dx = qAbs(x - playerTile->position().x());
+                    int dy = qAbs(y - playerTile->position().y());
                     if(dx < minRange && dy < minRange)
                         posOk = false;
                 }
