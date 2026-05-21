@@ -1,5 +1,6 @@
 #include "sprite.h"
 #include <QDebug>
+#include <QMap>
 
 Sprite::Sprite(QObject *parent) : QObject(parent), QGraphicsPixmapItem(){
 }
@@ -11,6 +12,11 @@ QPixmap Sprite::loadBitmap(QString filename, int colorindex) {
 }
 
 QPixmap Sprite::loadBitmap(QString filename, QColor color) {
+    static QMap<QString, QPixmap> cache;
+    const QString cacheKey = filename + "|" + QString::number(color.rgba(), 16);
+    if(cache.contains(cacheKey))
+        return cache.value(cacheKey);
+
     QImage image(filename);
     if(image.isNull()) {
         qDebug() << Q_FUNC_INFO << "Unable to load image " << filename;
@@ -33,5 +39,6 @@ QPixmap Sprite::loadBitmap(QString filename, QColor color) {
     QPixmap sprite = QPixmap::fromImage(image);
     //Q_ASSERT(sprite.hasAlphaChannel());
     Q_ASSERT(!sprite.isNull());
+    cache.insert(cacheKey, sprite);
     return sprite;
 }

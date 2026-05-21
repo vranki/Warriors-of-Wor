@@ -66,7 +66,7 @@ private:
     bool highlight;
     int _walls;
     QGraphicsPixmapItem np, wp, fireItem, sandItem;
-    QPixmap *nPixmap[6], *wPixmap[6], fireCenterPixmap, fireHorizontalPixmap, fireVerticalPixmap, sandPixmap;
+    QPixmap nPixmap[6], wPixmap[6], fireCenterPixmap, fireHorizontalPixmap, fireVerticalPixmap, sandPixmap;
     int mode; // 0=normal, 1=worluk, 2=wizard
     bool swapOtherImage;
     bool fireTile;

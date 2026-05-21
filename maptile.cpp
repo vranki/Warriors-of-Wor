@@ -5,6 +5,74 @@
 #include <QImage>
 #include <QDebug>
 
+namespace {
+struct MapTilePixmaps {
+    QPixmap n[6];
+    QPixmap w[6];
+    QPixmap fireCenter;
+    QPixmap fireHorizontal;
+    QPixmap fireVertical;
+    QPixmap sand;
+
+    MapTilePixmaps() {
+        for(int i=0;i<6;i++) {
+            QColor c = C64Palette::color(6);
+            if(i==2 || i==3) c=C64Palette::color(2);
+            if(i==4 || i==5) c=C64Palette::color(1);
+
+            n[i] = Sprite::loadBitmap("wow-sprites/wall_n.png", c);
+            w[i] = Sprite::loadBitmap("wow-sprites/wall_w.png", c);
+        }
+
+        for(int i=2;i<6;i++) {
+            QImage im = n[i].toImage();
+            QPainter painter(&im);
+            int y=0;
+            if(i % 2==0) y=1;
+            for(int x=0;x<im.width();x=x+2) {
+                painter.setPen(Qt::black);
+                painter.drawRect(x,y,1,0);
+                if(y==0) {
+                    y = 1;
+                } else {
+                    y = 0;
+                }
+            }
+            painter.end();
+            n[i].convertFromImage(im);
+        }
+
+        for(int i=2;i<6;i++) {
+            QImage im = w[i].toImage();
+            QPainter painter(&im);
+            int y=0;
+            if(i % 2==0) y=1;
+            for(int x=0;x<im.height();x=x+1) {
+                painter.setPen(Qt::black);
+                painter.drawRect(y,x,0,0);
+                if(y==0) {
+                    y = 1;
+                } else {
+                    y = 0;
+                }
+            }
+            painter.end();
+            w[i].convertFromImage(im);
+        }
+
+        fireCenter = Sprite::loadBitmap("wow-sprites/fire-center.bmp", C64Palette::color(7));
+        fireHorizontal = Sprite::loadBitmap("wow-sprites/fire-horizontal.bmp", C64Palette::color(7));
+        fireVertical = Sprite::loadBitmap("wow-sprites/fire-vertical.bmp", C64Palette::color(7));
+        sand = Sprite::loadBitmap("wow-sprites/sand.bmp", C64Palette::color(9));
+    }
+};
+
+MapTilePixmaps& mapTilePixmaps() {
+    static MapTilePixmaps pixmaps;
+    return pixmaps;
+}
+}
+
 MapTile::MapTile(TilePos newPos) : QObject(), QGraphicsItem() {
     myPos = newPos;
     mn = ms = mw = me = 0;
@@ -13,69 +81,28 @@ MapTile::MapTile(TilePos newPos) : QObject(), QGraphicsItem() {
     swapOtherImage = 0;
     tileContent = 0;
     setZValue(-10);
+    MapTilePixmaps& pixmaps = mapTilePixmaps();
     for(int i=0;i<6;i++) {
-        QColor c = C64Palette::color(6);
-        if(i==2 || i==3) c=C64Palette::color(2);
-        if(i==4 || i==5) c=C64Palette::color(1);
-
-        nPixmap[i] = new QPixmap(Sprite::loadBitmap("wow-sprites/wall_n.png", c));
-        wPixmap[i] = new QPixmap(Sprite::loadBitmap("wow-sprites/wall_w.png", c));
+        nPixmap[i] = pixmaps.n[i];
+        wPixmap[i] = pixmaps.w[i];
     }
     np.setShapeMode(QGraphicsPixmapItem::BoundingRectShape);
     wp.setShapeMode(QGraphicsPixmapItem::BoundingRectShape);
     np.setParentItem(this);
     wp.setParentItem(this);
 
-    for(int i=2;i<6;i++) {
-        QPixmap * pm = nPixmap[i];
-        QImage im = pm->toImage();
-        QPainter painter(&im);
-        int y=0;
-        if(i % 2==0) y=1;
-        for(int x=0;x<im.width();x=x+2) {
-            painter.setPen(Qt::black);
-            painter.drawRect(x,y,1,0);
-            if(y==0) {
-                y = 1;
-            } else {
-                y = 0;
-            }
-        }
-        painter.end();
-        pm->convertFromImage(im);
-    }
-
-    for(int i=2;i<6;i++) {
-        QPixmap * pm = wPixmap[i];
-        QImage im = pm->toImage();
-        QPainter painter(&im);
-        int y=0;
-        if(i % 2==0) y=1;
-        for(int x=0;x<im.height();x=x+1) {
-            painter.setPen(Qt::black);
-            painter.drawRect(y,x,0,0);
-            if(y==0) {
-                y = 1;
-            } else {
-                y = 0;
-            }
-        }
-        painter.end();
-        pm->convertFromImage(im);
-    }
-
     fireTimer.setSingleShot(true);
     connect(&fireTimer, SIGNAL(timeout()), this, SLOT(endFire()));
     fireTimer.setInterval(1000);
 
-    fireCenterPixmap = Sprite::loadBitmap("wow-sprites/fire-center.bmp", C64Palette::color(7));
-    fireHorizontalPixmap = Sprite::loadBitmap("wow-sprites/fire-horizontal.bmp", C64Palette::color(7));
-    fireVerticalPixmap = Sprite::loadBitmap("wow-sprites/fire-vertical.bmp", C64Palette::color(7));
+    fireCenterPixmap = pixmaps.fireCenter;
+    fireHorizontalPixmap = pixmaps.fireHorizontal;
+    fireVerticalPixmap = pixmaps.fireVertical;
     fireItem.setParentItem(this);
     fireItem.setZValue(-20);
     fireItem.setVisible(false);
 
-    sandPixmap = Sprite::loadBitmap("wow-sprites/sand.bmp", C64Palette::color(9));
+    sandPixmap = pixmaps.sand;
     sandItem.setParentItem(this);
     sandItem.setZValue(20);
     sandItem.setVisible(false);
@@ -85,10 +112,6 @@ MapTile::MapTile(TilePos newPos) : QObject(), QGraphicsItem() {
 }
 
 MapTile::~MapTile() {
-    for(int i=0;i<6;i++) {
-        delete nPixmap[i];
-        delete wPixmap[i];
-    }
 }
 
 void MapTile::setNeightbors(MapTile *nn, MapTile *ns, MapTile *nw, MapTile *ne) {
@@ -183,8 +206,8 @@ void MapTile::setWalls(int nw) {
 
 void MapTile::setMode(int m) {
     mode = m;
-    np.setPixmap(*nPixmap[mode*2]);
-    wp.setPixmap(*wPixmap[mode*2]);
+    np.setPixmap(nPixmap[mode*2]);
+    wp.setPixmap(wPixmap[mode*2]);
 }
 
 void MapTile::setContent(int newContent)
@@ -208,11 +231,11 @@ int MapTile::content() const
 
 void MapTile::changePattern() {
     if(swapOtherImage) {
-        np.setPixmap(*nPixmap[mode*2]);
-        wp.setPixmap(*wPixmap[mode*2]);
+        np.setPixmap(nPixmap[mode*2]);
+        wp.setPixmap(wPixmap[mode*2]);
     } else {
-        np.setPixmap(*nPixmap[mode*2+1]);
-        wp.setPixmap(*wPixmap[mode*2+1]);
+        np.setPixmap(nPixmap[mode*2+1]);
+        wp.setPixmap(wPixmap[mode*2+1]);
     }
     swapOtherImage = !swapOtherImage;
 }
