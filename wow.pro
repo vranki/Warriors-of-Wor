@@ -9,10 +9,55 @@ QT += widgets
 
 TARGET = wow
 TEMPLATE = app
-CONFIG   += link_pkgconfig
-PKGCONFIG += cwiid sdl2
 
-LIBS += -lSDL2_mixer
+unix {
+    CONFIG   += link_pkgconfig
+    PKGCONFIG += cwiid sdl2
+    LIBS += -lSDL2_mixer
+}
+
+win32 {
+    DEFINES += WOW_NO_CWIID SDL_MAIN_HANDLED
+
+    isEmpty(SDL2_DIR) {
+        SDL2_DIR = $$(SDL2_DIR)
+    }
+    isEmpty(SDL2_MIXER_DIR) {
+        SDL2_MIXER_DIR = $$(SDL2_MIXER_DIR)
+    }
+    isEmpty(SDL2_DIR) {
+        SDL2_CANDIDATES = $$PWD/.deps/SDL2 $$files($$PWD/.deps/SDL2-*)
+        for(SDL2_CANDIDATE, SDL2_CANDIDATES) {
+            isEmpty(SDL2_DIR):exists($$SDL2_CANDIDATE/include/SDL.h) {
+                SDL2_DIR = $$SDL2_CANDIDATE
+            }
+        }
+    }
+    isEmpty(SDL2_MIXER_DIR) {
+        SDL2_MIXER_CANDIDATES = $$PWD/.deps/SDL2_mixer $$files($$PWD/.deps/SDL2_mixer-*)
+        for(SDL2_MIXER_CANDIDATE, SDL2_MIXER_CANDIDATES) {
+            isEmpty(SDL2_MIXER_DIR):exists($$SDL2_MIXER_CANDIDATE/include/SDL_mixer.h) {
+                SDL2_MIXER_DIR = $$SDL2_MIXER_CANDIDATE
+            }
+        }
+    }
+
+    !isEmpty(SDL2_DIR) {
+        INCLUDEPATH += $$SDL2_DIR/include $$SDL2_DIR/include/SDL2
+        LIBS += -L$$SDL2_DIR/lib -L$$SDL2_DIR/lib/x64
+    } else {
+        DEFINES += WOW_NO_SDL
+    }
+
+    !isEmpty(SDL2_MIXER_DIR) {
+        INCLUDEPATH += $$SDL2_MIXER_DIR/include $$SDL2_MIXER_DIR/include/SDL2
+        LIBS += -L$$SDL2_MIXER_DIR/lib -L$$SDL2_MIXER_DIR/lib/x64
+    }
+
+    !contains(DEFINES, WOW_NO_SDL) {
+        LIBS += -lSDL2 -lSDL2_mixer
+    }
+}
 
 SOURCES += main.cpp\
         mainwindow.cpp \

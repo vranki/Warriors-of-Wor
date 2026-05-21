@@ -1,8 +1,10 @@
 #ifndef SAMPLEPLAYER_H
 #define SAMPLEPLAYER_H
 
+#ifndef WOW_NO_SDL
 #include <SDL.h>
 #include <SDL_mixer.h>
+#endif
 #include <QString>
 #include <QMap>
 #include <QDebug>
@@ -59,12 +61,16 @@ public slots:
 private slots:
     void nextBgSound();
 private:
+#ifndef WOW_NO_SDL
     QMap<gameSample, Mix_Chunk*> sounds;
-    int channel;		//Channel on which our sound is played
-    int audio_rate;		//Frequency of audio playback
-    Uint16 audio_format; 	//Format of the audio we're playing
-    int audio_channels;		//2 channels = stereo
-    int audio_buffers;		//Size of the audio buffers in memory
+#endif
+    int channel;        // Channel on which our sound is played.
+#ifndef WOW_NO_SDL
+    int audio_rate;     // Frequency of audio playback.
+    Uint16 audio_format;    // Format of the audio we're playing.
+    int audio_channels;     // 2 channels = stereo.
+    int audio_buffers;      // Size of the audio buffers in memory.
+#endif
     int bgChannel;
     int bgSample;
     bool bgIsLoop;

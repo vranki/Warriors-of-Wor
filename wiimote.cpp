@@ -1,5 +1,58 @@
 #include "wiimote.h"
 
+#ifdef WOW_NO_CWIID
+
+WiiMote::WiiMote(cwiid_wiimote_t * h, int number) : handle(h),
+    currentButtons(0),
+    rumbleTimer(this),
+    myNumber(number)
+{
+    Q_UNUSED(h);
+}
+
+WiiMote::~WiiMote()
+{
+}
+
+int WiiMote::defaultFlags()
+{
+    return 0;
+}
+
+void WiiMote::setNumber(int num)
+{
+    myNumber = num;
+}
+
+int WiiMote::id()
+{
+    return myNumber;
+}
+
+int WiiMote::number()
+{
+    return myNumber;
+}
+
+void WiiMote::pollMote()
+{
+}
+
+void WiiMote::close()
+{
+    handle = 0;
+}
+
+void WiiMote::shake()
+{
+}
+
+void WiiMote::stopShaking()
+{
+}
+
+#else
+
 WiiMote::WiiMote(cwiid_wiimote_t * h, int number) : rumbleTimer(this)
 {
     Q_ASSERT(h);
@@ -132,3 +185,5 @@ void WiiMote::stopShaking() {
 
     }
 }
+
+#endif

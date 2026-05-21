@@ -47,11 +47,16 @@ void WiimoteFinder::pollMotes() {
 }
 
 void WiimoteFinder::run() {
+#ifdef WOW_NO_CWIID
+    foundWiimoteHandle = 0;
+    foundWiimoteReally = false;
+#else
 //    qDebug() << Q_FUNC_INFO;
     bdaddr_t bdaddr = {{0,0,0,0,0,0}};
     memset(&bdaddr,0,sizeof(bdaddr_t));
     foundWiimoteHandle = cwiid_open(&bdaddr, WiiMote::defaultFlags());
     foundWiimoteReally = true;
+#endif
 }
 
 void WiimoteFinder::freeMote(WiiMote *wm) {

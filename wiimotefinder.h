@@ -1,7 +1,9 @@
 #ifndef WIIMOTEFINDER_H
 #define WIIMOTEFINDER_H
 
+#ifndef WOW_NO_CWIID
 #include <cwiid.h>
+#endif
 #include <QDebug>
 #include <QList>
 #include <QObject>

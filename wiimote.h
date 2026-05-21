@@ -5,7 +5,13 @@
 #include <QDebug>
 #include <QPoint>
 #include <QTimer>
+#ifndef WOW_NO_CWIID
 #include <cwiid.h>
+#endif
+
+#ifdef WOW_NO_CWIID
+typedef void cwiid_wiimote_t;
+#endif
 
 class WiiMote : public QObject
 {

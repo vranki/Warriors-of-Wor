@@ -5,3 +5,7 @@ moc_*.cpp
 moc_predefs.h
 ui_mainwindow.h
 Makefile
+/.qt/
+/build-windows/
+/aqtinstall.log
+/.deps/

@@ -3,11 +3,15 @@
 SamplePlayer::SamplePlayer(QObject *parent) : QObject(parent)
 {
     bgChannel = -1;
+    channel = -1;
+#ifndef WOW_NO_SDL
     audio_rate = 22050;
     audio_format = AUDIO_S16SYS;
     audio_channels = 2;
     audio_buffers = 4096;
+#endif
     bgIsLoop = true;
+#ifndef WOW_NO_SDL
     if (SDL_Init(SDL_INIT_AUDIO) != 0) {
         qDebug() << "Unable to initialize SDL: " << SDL_GetError();
     }
@@ -32,6 +36,7 @@ SamplePlayer::SamplePlayer(QObject *parent) : QObject(parent)
     loadSample("samples/bg_3.wav", GS_BACKGROUND_3);
     loadSample("samples/worluk_died.wav", GS_WORLUKDIED);
     loadSample("samples/wizard_died.wav", GS_WIZARDDIED);
+#endif
     connect(&bgTimer, SIGNAL(timeout()), this, SLOT(nextBgSound()));
     bgTimer.setInterval(1000);
     bgTimer.setSingleShot(false);
@@ -39,24 +44,36 @@ SamplePlayer::SamplePlayer(QObject *parent) : QObject(parent)
 
 SamplePlayer::~SamplePlayer() {
     qDebug() << Q_FUNC_INFO;
+#ifndef WOW_NO_SDL
     foreach(Mix_Chunk *sound, sounds)
         Mix_FreeChunk(sound);
     /* If these are done, the game crashes on quit. Possibly known SDL bug.
     Mix_CloseAudio();
     SDL_Quit();
     */
+#endif
 }
 
 void SamplePlayer::loadSample(QString file, gameSample sample) {
+#ifdef WOW_NO_SDL
+    Q_UNUSED(file);
+    Q_UNUSED(sample);
+#else
     //Load our WAV file from disk
     Mix_Chunk* sound = Mix_LoadWAV(file.toUtf8().data());
     sounds[sample] = sound;
     if(sound == NULL) {
         qDebug() << Q_FUNC_INFO << "Unable to load WAV file: " << file << Mix_GetError();
     }
+#endif
 }
 
 int SamplePlayer::playSound(gameSample sample, int loops) {
+#ifdef WOW_NO_SDL
+    Q_UNUSED(sample);
+    Q_UNUSED(loops);
+    return -1;
+#else
     //qDebug() << "Playing sample " << sample;
     Mix_Chunk* sound = sounds.value(sample);
     if(!sound) {
@@ -70,6 +87,7 @@ int SamplePlayer::playSound(gameSample sample, int loops) {
     }
     //qDebug() << "Played sample " << sample << " sucessfully.";
     return channel;
+#endif
 }
 
 int SamplePlayer::shoot() {
@@ -105,11 +123,15 @@ int SamplePlayer::spawn() {
 }
 
 void SamplePlayer::stopSound(int channel) {
+#ifdef WOW_NO_SDL
+    Q_UNUSED(channel);
+#else
     if(channel >= 0) {
         Mix_HaltChannel(channel);
     } else {
         qDebug() << "Trying to stop null channel!!";
     }
+#endif
 }
 int SamplePlayer::deathexplosion() {
     return playSound(GS_DEATHEXPLOSION);
