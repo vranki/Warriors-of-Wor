@@ -58,6 +58,7 @@ signals:
 protected:
     virtual void resizeEvent(QResizeEvent *event);
 private:
+    bool addKeyboardPlayer();
     void setupPlayer(Player* p, QObject *controller);
     void stopGame();
     SamplePlayer samples;

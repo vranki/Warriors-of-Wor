@@ -50,7 +50,7 @@ void MainWindow::loopTimeout() {
         abort();
     }
     time.restart();
-    if(dt > 100) dt = 100; // Limit speed on really slow FPS
+    if(dt > 0.1f) dt = 0.1f; // Limit jump after stalls or debugger pauses.
     foreach(Character *p, characters)
         p->tick(dt);
     field.tick(dt);
@@ -75,12 +75,15 @@ void MainWindow::keyPressEvent (QKeyEvent * e) {
     } else if(e->key()==Qt::Key_Space) {
         emit buttonPressed(1);
         e->accept();
-    } else if(e->key()==Qt::Key_R) {
+    } else if(e->key()==Qt::Key_R || e->key()==Qt::Key_Minus || e->text()=="-") {
         emit buttonPressed(8);
         wiimoteButtonPressed(8);
         e->accept();
-    } else if(e->key()==Qt::Key_S) {
+    } else if(e->key()==Qt::Key_S || e->key()==Qt::Key_Plus || e->key()==Qt::Key_Equal ||
+              e->key()==Qt::Key_Return || e->key()==Qt::Key_Enter || e->text()=="+") {
         emit buttonPressed(4);
+        if(gameState == GS_PLAYER_SELECT && characters.isEmpty())
+            addKeyboardPlayer();
         wiimoteButtonPressed(4);
         e->accept();
     } else if(e->key()==Qt::Key_Q) {
@@ -94,15 +97,7 @@ void MainWindow::keyPressEvent (QKeyEvent * e) {
             showFullScreen();
         }
         e->accept();
-    } else if(e->key()==Qt::Key_K && gameState == 0 /*&& !keyboardPlayerCreated*/ && characters.size()<8) {
-        Player *p = new Player(this,
-                               &field,
-                               &samples,
-                               C64Palette::color(playerColors[characters.size()]),
-                               0,0,
-                               characters.size());
-        setupPlayer(p, this);
-        keyboardPlayerCreated = true;
+    } else if(e->key()==Qt::Key_K && addKeyboardPlayer()) {
         e->accept();
     }
 
@@ -110,6 +105,21 @@ void MainWindow::keyPressEvent (QKeyEvent * e) {
         emit controlInput(controllerDir);
     if(!e->isAccepted())
         e->ignore();
+}
+
+bool MainWindow::addKeyboardPlayer() {
+    if(gameState != GS_PLAYER_SELECT || characters.size() >= 8)
+        return false;
+
+    Player *p = new Player(this,
+                           &field,
+                           &samples,
+                           C64Palette::color(playerColors[characters.size()]),
+                           0,0,
+                           characters.size());
+    setupPlayer(p, this);
+    keyboardPlayerCreated = true;
+    return true;
 }
 
 void MainWindow::setupPlayer(Player* p, QObject *controller) {
