@@ -1,4 +1,5 @@
 #include "stealthcharacter.h"
+#include <QRandomGenerator>
 
 StealthCharacter::StealthCharacter(QObject *parent,
                                    PlayfieldInfo *pfinfo,
@@ -16,7 +17,7 @@ StealthCharacter::StealthCharacter(QObject *parent,
 void StealthCharacter::tileEntered(MapTile *mt) {
     EnemyCharacter::tileEntered(mt);
     bool oldStealthMode = stealthMode;
-    if(stealthProbability > 0 && qrand()%stealthProbability==0) {
+    if(stealthProbability > 0 && QRandomGenerator::global()->bounded(stealthProbability)==0) {
         if(!stealthMode) {
             if(!seesPlayer())
                 stealthMode = true;

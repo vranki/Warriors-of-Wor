@@ -2,6 +2,7 @@
 #include "player.h"
 #include "characters/enemycharacter.h"
 #include <QFile>
+#include <QRandomGenerator>
 #include <QTextStream>
 #include "maptile.h"
 Playfield::Playfield(QObject *parent, QList<Character*> &chars) : QObject(parent), _scene(), characters(chars) {
@@ -226,11 +227,11 @@ SpawnTile* Playfield::spawnPoint(int num) {
 }
 
 void Playfield::removeRandomWall() {
-    int x = 2+qrand() % (MAPW-3);
-    int y = 2+qrand() % (MAPH-4);
+    int x = 2 + QRandomGenerator::global()->bounded(MAPW - 3);
+    int y = 2 + QRandomGenerator::global()->bounded(MAPH - 4);
     MapTile *mt = tileAt(TilePos(x,y));
     Q_ASSERT(mt);
-    if(qrand() % 2 == 1) {
+    if(QRandomGenerator::global()->bounded(2) == 1) {
         if(mt->walls() & MapTile::MT_W)
             mt->setWalls(mt->walls() - MapTile::MT_W);
     } else {
@@ -279,8 +280,8 @@ void Playfield::setMode(int m) {
 
 MapTile *Playfield::randomTile(bool notCloseToCharacters) {
     //qDebug() << Q_FUNC_INFO << "notCloseToCharacters:" << notCloseToCharacters << " characters.size():" << characters.size();
-    int x = 1+qrand() % (MAPW-2);
-    int y = 1+qrand() % (MAPH-2);
+    int x = 1 + QRandomGenerator::global()->bounded(MAPW - 2);
+    int y = 1 + QRandomGenerator::global()->bounded(MAPH - 2);
     //qDebug() << "characters has size " << characters.size();
     if(notCloseToCharacters) {
         for(int minRange = 4; minRange >0;minRange--) {
@@ -306,8 +307,8 @@ MapTile *Playfield::randomTile(bool notCloseToCharacters) {
                 return tileAt(TilePos(x,y));
             }
             //qDebug() << "random position";
-            x = 1+qrand() % (MAPW-2);
-            y = 1+qrand() % (MAPH-2);
+            x = 1 + QRandomGenerator::global()->bounded(MAPW - 2);
+            y = 1 + QRandomGenerator::global()->bounded(MAPH - 2);
         }
     }
     //qDebug() << "returning " << x << y;
