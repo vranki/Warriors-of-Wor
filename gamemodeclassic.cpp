@@ -369,7 +369,8 @@ void GameModeClassic::setupNewEnemy(EnemyCharacter *c) {
 void GameModeClassic::worlukEscaped() {
     qDebug() << Q_FUNC_INFO << "worlukEscaped";
     Q_ASSERT(enemyCharacters().size()==1 && worluk);
-    Q_ASSERT(characters.removeOne(worluk));
+    bool removed = characters.removeOne(worluk);
+    Q_ASSERT(removed);
     worluk->deleteLater();
     worluk = 0;
     field->setMode(false);
