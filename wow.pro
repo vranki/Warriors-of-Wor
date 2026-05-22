@@ -10,7 +10,19 @@ QT += widgets
 TARGET = wow
 TEMPLATE = app
 CONFIG   += link_pkgconfig
-PKGCONFIG += cwiid sdl2
+PKGCONFIG += sdl2
+
+!contains(CONFIG, no_cwiid) {
+    packagesExist(cwiid) {
+        PKGCONFIG += cwiid
+        DEFINES += HAVE_CWIID
+        CONFIG += have_cwiid
+    } else {
+        message("cwiid not found; Wiimote support disabled")
+    }
+} else {
+    message("cwiid disabled; Wiimote support disabled")
+}
 
 LIBS += -lSDL2_mixer
 
@@ -21,8 +33,6 @@ SOURCES += main.cpp\
     playfieldinfo.cpp \
     maptile.cpp \
     lazorbeam.cpp \
-    wiimote.cpp \
-    wiimotefinder.cpp \
     player.cpp \
     gamemenu.cpp \
     sampleplayer.cpp \
@@ -55,8 +65,6 @@ HEADERS  += mainwindow.h \
     playfieldinfo.h \
     maptile.h \
     lazorbeam.h \
-    wiimote.h \
-    wiimotefinder.h \
     player.h \
     gamemenu.h \
     sampleplayer.h \
@@ -88,3 +96,11 @@ FORMS    += mainwindow.ui
 OTHER_FILES += \
     maps_wow.txt \
     maps_bomberman.txt
+
+have_cwiid {
+    SOURCES += wiimote.cpp \
+        wiimotefinder.cpp
+
+    HEADERS += wiimote.h \
+        wiimotefinder.h
+}
