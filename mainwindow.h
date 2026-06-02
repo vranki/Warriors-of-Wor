@@ -11,8 +11,10 @@
 #include <QFontDatabase>
 #include "playfield.h"
 //#include "character.h"
+#ifdef HAVE_CWIID
 #include "wiimote.h"
 #include "wiimotefinder.h"
+#endif
 #include "gamemenu.h"
 #include "player.h"
 #include "sampleplayer.h"
@@ -45,7 +47,9 @@ public:
     void resetPlayers();
 public slots:
     void loopTimeout();
+#ifdef HAVE_CWIID
     void wiimoteFound(WiiMote *wm);
+#endif
     void wiimoteButtonPressed(int buttons);
     void gameModeSelected(GameMode *gm);
     void showRoundEnd(Player *winner);
@@ -65,7 +69,9 @@ private:
     QTimer mainTimer;
     QTime time;
     QPoint controllerDir;
+#ifdef HAVE_CWIID
     WiimoteFinder wmFinder;
+#endif
     PlayerSelectionMenu *playerSelectionMenu;
     GameSelectionMenu *gameSelectionMenu;
     RoundEndScreen *roundEndScreen;

@@ -13,8 +13,10 @@ MainWindow::MainWindow(QWidget *parent) : QGraphicsView(parent), samples(), fiel
     mainTimer.setInterval(1000 * 1.0/60.0);
     mainTimer.start();
     time.start();
+#ifdef HAVE_CWIID
     connect(&wmFinder, SIGNAL(wiimoteFound(WiiMote*)), this, SLOT(wiimoteFound(WiiMote*)));
     wmFinder.scanMote();
+#endif
     playerSelectionMenu = 0;
     gameSelectionMenu = 0;
     roundEndScreen = 0;
@@ -54,7 +56,9 @@ void MainWindow::loopTimeout() {
     foreach(Character *p, characters)
         p->tick(dt);
     field.tick(dt);
+#ifdef HAVE_CWIID
     wmFinder.pollMotes();
+#endif
 }
 
 void MainWindow::keyPressEvent (QKeyEvent * e) {
@@ -125,8 +129,10 @@ void MainWindow::setupPlayer(Player* p, QObject *controller) {
 }
 
 void MainWindow::stopGame() {
+#ifdef HAVE_CWIID
     wmFinder.stopScan();
     wmFinder.quit();
+#endif
 }
 
 void MainWindow::keyReleaseEvent (QKeyEvent * e) {
@@ -146,6 +152,7 @@ void MainWindow::keyReleaseEvent (QKeyEvent * e) {
         e->ignore();
 }
 
+#ifdef HAVE_CWIID
 void MainWindow::wiimoteFound(WiiMote *wm) {
     if(!wm) {
         return;
@@ -159,6 +166,7 @@ void MainWindow::wiimoteFound(WiiMote *wm) {
     setupPlayer(p, wm);
     connect(wm, SIGNAL(buttonPressed(int)), this, SLOT(wiimoteButtonPressed(int)));
 }
+#endif
 
 void MainWindow::resizeEvent(QResizeEvent *event) {
     fitInView(-32,-36,352,236, Qt::KeepAspectRatio);
@@ -170,7 +178,9 @@ void MainWindow::wiimoteButtonPressed(int buttons) {
             scene()->removeItem(playerSelectionMenu);
             delete playerSelectionMenu;
             playerSelectionMenu = 0;
+#ifdef HAVE_CWIID
             wmFinder.stopScan();
+#endif
             gameState = GS_GAME_SELECT; // Enter game select
             gameSelectionMenu = new GameSelectionMenu(this, characters);
             connect(gameSelectionMenu, SIGNAL(gameModeSelected(GameMode*)), this, SLOT(gameModeSelected(GameMode*)));
@@ -205,10 +215,12 @@ void MainWindow::wiimoteButtonPressed(int buttons) {
 
 void MainWindow::resetPlayers() {
     if(gameState != 0) return;
+#ifdef HAVE_CWIID
     while(!wmFinder.wiimotes.isEmpty()) {
         WiiMote *m = wmFinder.wiimotes.first();
         wmFinder.freeMote(m);
     }
+#endif
     while(!characters.isEmpty()) {
         Character *c= characters.first();
         Player *p = qobject_cast<Player*>(c);
