@@ -212,8 +212,11 @@ void MainWindow::resetPlayers() {
     while(!characters.isEmpty()) {
         Character *c= characters.first();
         Player *p = qobject_cast<Player*>(c);
-        if(p)
-            field.spawnPoint(p->number())->setUsedByPlayer(false);
+        if(p) {
+            SpawnTile *spawn = field.spawnPoint(p->number());
+            if(spawn)
+                spawn->setUsedByPlayer(false);
+        }
         characters.removeOne(c);
         c->deleteLater();
     }
