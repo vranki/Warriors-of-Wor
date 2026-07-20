@@ -12,9 +12,11 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-    - uses: actions/checkout@v3
+    - uses: actions/checkout@v7
     - name: retrieve build dependencies
-      run: sudo apt install qt5-qmake libcwiid-dev libsdl1.2-compat-dev qtbase5-dev libsdl2-mixer-dev
+      run: |
+           sudo apt update
+           sudo apt install -y --no-install-recommends qt5-qmake libcwiid-dev libsdl1.2-compat-dev qtbase5-dev libsdl2-mixer-dev
     - name: qmake
       run: qmake
     - name: make
