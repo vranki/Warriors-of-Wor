@@ -5,6 +5,7 @@
 #include <QRandomGenerator>
 #include <QTextStream>
 #include "maptile.h"
+
 Playfield::Playfield(QObject *parent, QList<Character*> &chars) : QObject(parent), _scene(), characters(chars) {
     for(int x=0;x < MAPW;x++)
         for(int y=0;y < MAPH; y++)
@@ -48,7 +49,6 @@ void Playfield::setMapName(const QString& name) {
 }
 
 void Playfield::loadMap(int num) {
-    //qDebug() << Q_FUNC_INFO << "num:" << num;
     QFile mapFile(mapFileName);
     Q_ASSERT(mapFile.exists());
     mapFile.open(QIODevice::ReadOnly);
@@ -75,16 +75,12 @@ void Playfield::loadMap(int num) {
         if(line.startsWith("MAP")) {
             lineNumber=0;
             loadedMaps++;
-            qDebug() << Q_FUNC_INFO << "Next map: " << loadedMaps;
         } else {
-  //          qDebug() << Q_FUNC_INFO << y << (y % 2);
             if(loadedMaps==num && (lineNumber % 2)) {
                 if(line.endsWith('\n'))
                     line.chop(1);
                 while(line.length() < MAPW*2+2)
                     line.append(' ');
-//                qDebug() << Q_FUNC_INFO << "Loading this";
-                qDebug() << Q_FUNC_INFO << "Line:" << line << y;
                 for(int x = 0; x < MAPW; x++) {
                     QChar mapChar = line.at(1+x*2);
                     // First, figure out which walls this tile has:
@@ -240,13 +236,11 @@ void Playfield::removeRandomWall() {
     }
 }
 
-void Playfield::tick(float dt) {
-
-}
+void Playfield::tick(float dt) {}
 
 bool Playfield::tileContainsPlayer(MapTile *mt) {
     QList<QGraphicsItem*> items = mt->collidingItems(Qt::IntersectsItemBoundingRect);
-    foreach(QGraphicsItem* item, items) {
+    for(QGraphicsItem* item : items) {
         if(dynamic_cast<Player*> (item))
             return true;
     }
@@ -255,7 +249,7 @@ bool Playfield::tileContainsPlayer(MapTile *mt) {
 
 bool Playfield::tileContainsEnemy(MapTile *mt) {
     QList<QGraphicsItem*> items = mt->collidingItems(Qt::IntersectsItemBoundingRect);
-    foreach(QGraphicsItem* item, items) {
+    for(QGraphicsItem* item : items) {
         if(dynamic_cast<EnemyCharacter*> (item))
             return true;
     }
@@ -279,16 +273,13 @@ void Playfield::setMode(int m) {
 }
 
 MapTile *Playfield::randomTile(bool notCloseToCharacters) {
-    //qDebug() << Q_FUNC_INFO << "notCloseToCharacters:" << notCloseToCharacters << " characters.size():" << characters.size();
     int x = 1 + QRandomGenerator::global()->bounded(MAPW - 2);
     int y = 1 + QRandomGenerator::global()->bounded(MAPH - 2);
-    //qDebug() << "characters has size " << characters.size();
     if(notCloseToCharacters) {
         for(int minRange = 4; minRange >0;minRange--) {
             bool posOk = true;
-            foreach(Character *c, characters) {
+            for(Character *c : characters) {
                 if (!c) {
-                    //qDebug() << "Error: Character in list is NULL";
                     continue;
                 }
                 Player *p = qobject_cast<Player*>(c);
@@ -303,15 +294,12 @@ MapTile *Playfield::randomTile(bool notCloseToCharacters) {
                 }
             }
             if(posOk) {
-                //qDebug() << "posOK at " << x << y;
                 return tileAt(TilePos(x,y));
             }
-            //qDebug() << "random position";
             x = 1 + QRandomGenerator::global()->bounded(MAPW - 2);
             y = 1 + QRandomGenerator::global()->bounded(MAPH - 2);
         }
     }
-    //qDebug() << "returning " << x << y;
     return tileAt(TilePos(x,y));
 }
 

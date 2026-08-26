@@ -1,12 +1,8 @@
-<div style="text-align: center;">
-<h1 style="color: red; background-color: black;">
-    <img src="https://raw.githubusercontent.com/vranki/Warriors-of-Wor/master/wow-sprites/spr2E9E.bmp" alt="Player" style="vertical-align: middle;">
-    BOMBERWARRIORS OF WOR
-    <img src="https://raw.githubusercontent.com/vranki/Warriors-of-Wor/master/wow-sprites/spr221E.bmp" alt="Monster" style="vertical-align: middle;">
-</h1>
+
+# BOMBERWARRIORS OF WOR
+
 by Ville Ranki <ville.ranki@iki.fi>
-</div>
-<p></p>
+
 BWOW is a remake and enhanced version of Commodore 64's 
 Wizard of Wor game. It supports 3 game modes and up to 8 
 players using Wiimotes.

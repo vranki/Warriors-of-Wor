@@ -1,9 +1,6 @@
 #ifndef PLAYFIELDINFO_H
 #define PLAYFIELDINFO_H
 
-#include <QPoint>
-#include <QPointF>
-
 #include "maptile.h"
 class SpawnTile;
 

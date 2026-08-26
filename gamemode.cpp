@@ -8,11 +8,8 @@ GameMode::GameMode(QObject *parent, QList<Character*> &plrs) :
 }
 
 void GameMode::setPlayersControllable(bool controllable) {
-    qDebug() << Q_FUNC_INFO << controllable;
-    foreach(Character *c, characters) {
+    for(auto *c : characters) {
         Player *p = qobject_cast<Player*>(c);
-        if(p) {
-            p->setControllable(controllable);
-        }
+        if(p) p->setControllable(controllable);
     }
 }

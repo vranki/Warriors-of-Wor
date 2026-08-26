@@ -2,9 +2,7 @@
 #include "characters/worrior.h"
 
 GameModeBomberman::GameModeBomberman(QObject *parent, QList<Character*> &plrs) :
-    GameMode(parent, plrs)
-{
-}
+    GameMode(parent, plrs) {}
 
 void GameModeBomberman::initGame(Playfield *f, SamplePlayer *s) {
     field = f;

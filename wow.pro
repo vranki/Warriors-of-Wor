@@ -29,7 +29,6 @@ LIBS += -lSDL2_mixer
 SOURCES += main.cpp\
         mainwindow.cpp \
     playfield.cpp \
-    characters/character.cpp \
     playfieldinfo.cpp \
     maptile.cpp \
     lazorbeam.cpp \
@@ -47,21 +46,21 @@ SOURCES += main.cpp\
     gamemodedeathmatch.cpp \
     gamemode.cpp \
     gamemodeclassic.cpp \
+    radar.cpp \
+    bomb.cpp \
+    characters/character.cpp \
     characters/burwor.cpp \
     characters/worrior.cpp \
     characters/enemycharacter.cpp \
     characters/garwor.cpp \
-    radar.cpp \
     characters/stealthcharacter.cpp \
     characters/thorwor.cpp \
     characters/worluk.cpp \
     characters/wizard.cpp \
-    gamemodebomberman.cpp \
-    bomb.cpp
+    gamemodebomberman.cpp
 
 HEADERS  += mainwindow.h \
     playfield.h \
-    characters/character.h \
     playfieldinfo.h \
     maptile.h \
     lazorbeam.h \
@@ -73,29 +72,31 @@ HEADERS  += mainwindow.h \
     spawntile.h \
     sprite.h \
     warptile.h \
+    radar.h \
     gameselectionmenu.h \
     roundendscreen.h \
     gameoverscreen.h \
     gamemodedeathmatch.h \
     gamemode.h \
     gamemodeclassic.h \
+    gamemodebomberman.h \
+    bomb.h \
+    characters/character.h \
     characters/burwor.h \
     characters/worrior.h \
     characters/enemycharacter.h \
     characters/garwor.h \
-    radar.h \
     characters/stealthcharacter.h \
     characters/thorwor.h \
     characters/worluk.h \
-    characters/wizard.h \
-    gamemodebomberman.h \
-    bomb.h
+    characters/wizard.h
 
 FORMS    += mainwindow.ui
 
 OTHER_FILES += \
     maps_wow.txt \
-    maps_bomberman.txt
+    maps_bomberman.txt \
+    README.md
 
 have_cwiid {
     SOURCES += wiimote.cpp \

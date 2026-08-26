@@ -1,8 +1,7 @@
 #include "sprite.h"
 #include <QDebug>
 
-Sprite::Sprite(QObject *parent) : QObject(parent), QGraphicsPixmapItem(){
-}
+Sprite::Sprite(QObject *parent) : QObject(parent), QGraphicsPixmapItem() {}
 
 
 QPixmap Sprite::loadBitmap(QString filename, int colorindex) {
@@ -31,7 +30,6 @@ QPixmap Sprite::loadBitmap(QString filename, QColor color) {
     }
     Q_ASSERT(image.hasAlphaChannel());
     QPixmap sprite = QPixmap::fromImage(image);
-    //Q_ASSERT(sprite.hasAlphaChannel());
     Q_ASSERT(!sprite.isNull());
     return sprite;
 }

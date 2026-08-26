@@ -21,15 +21,13 @@
 class Character : public Sprite {
     Q_OBJECT
 public:
-//    static const int C_KILLS_PLAYER=1;
-//    static const int C_IS_ENEMY=1<<1;
     enum WeaponType {
         WEAPON_LAZOR=0,
         WEAPON_BOMB
     };
 public:
     Character(QObject *parent, PlayfieldInfo *pfinfo, SamplePlayer *smp);
-    ~Character();
+    ~Character() = default;
     virtual void tick(float dt);
     MapTile *currentTile();
     QRectF boundingRect() const;

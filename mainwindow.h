@@ -67,7 +67,7 @@ private:
     SamplePlayer samples;
     Playfield field;
     QTimer mainTimer;
-    QTime time;
+    QElapsedTimer time;
     QPoint controllerDir;
 #ifdef HAVE_CWIID
     WiimoteFinder wmFinder;

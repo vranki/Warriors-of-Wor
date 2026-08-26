@@ -26,10 +26,8 @@ MainWindow::MainWindow(QWidget *parent) : QGraphicsView(parent), samples(), fiel
     field.setVisible(false);
     connect(this, SIGNAL(playerFound(Player*)), playerSelectionMenu, SLOT(repaintMenu()));
     gameState = GS_PLAYER_SELECT;
-    setViewportUpdateMode(QGraphicsView::MinimalViewportUpdate);
-    setRenderHints(0);
+    setViewportUpdateMode(QGraphicsView::FullViewportUpdate);
     setOptimizationFlag(QGraphicsView::DontAdjustForAntialiasing);
-//    setOptimizationFlag(QGraphicsView::DontSavePainterState);
     setGeometry(0,0,640, 400);
     setCursor(Qt::BlankCursor);
     setFocus();
@@ -44,17 +42,15 @@ MainWindow::~MainWindow() {
         gameMode->deleteLater();
 }
 
-static float dt = 0;
 void MainWindow::loopTimeout() {
-    dt = time.elapsed() / 1000.0;
+    double dt = time.elapsed() / 1000.0;
     if (dt < 0) {
         fprintf(stderr,"MaiWindow::loopTimeout(): dt < 0\n");
         abort();
     }
     time.restart();
     if(dt > 100) dt = 100; // Limit speed on really slow FPS
-    foreach(Character *p, characters)
-        p->tick(dt);
+    for(auto *p : characters) p->tick(dt);
     field.tick(dt);
 #ifdef HAVE_CWIID
     wmFinder.pollMotes();
@@ -87,7 +83,7 @@ void MainWindow::keyPressEvent (QKeyEvent * e) {
         emit buttonPressed(4);
         wiimoteButtonPressed(4);
         e->accept();
-    } else if(e->key()==Qt::Key_Q) {
+    } else if(e->key()==Qt::Key_Q || e->key()==Qt::Key_Escape) {
         stopGame();
         QCoreApplication::quit();
         e->accept();

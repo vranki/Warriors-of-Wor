@@ -32,7 +32,6 @@ int Player::controllerId() const {
 }
 
 void Player::characterKilled() {
-    //qDebug() << Q_FUNC_INFO;
     lives--;
     playfield->spawnPoint(playerNumber)->setLivesLeft(lives);
     lazorDestroyed();
@@ -48,7 +47,6 @@ void Player::characterKilled() {
 }
 
 void Player::spawnPlayer() {
-    //qDebug() << Q_FUNC_INFO;
     playfield->spawnPoint(playerNumber)->setUsedByPlayer(true);
     playfield->spawnPoint(playerNumber)->setPlayerImage(pixmap());
     playfield->spawnPoint(playerNumber)->setLivesLeft(lives);
@@ -60,27 +58,22 @@ void Player::spawnPlayer() {
 }
 
 int Player::livesLeft() const {
-    //qDebug() << Q_FUNC_INFO;
     return lives;
 }
 
 int Player::number() const {
-    //qDebug() << Q_FUNC_INFO;
     return playerNumber;
 }
 
 void Player::resetLives() {
-    //qDebug() << Q_FUNC_INFO;
     lives = 2;
 }
 
 void Player::addLife() {
-    //qDebug() << Q_FUNC_INFO;
     if(lives < 2) lives++;
 }
 
 void Player::resetPlayer() {
-    //qDebug() << Q_FUNC_INFO;
     resetCharacter();
     resetLives();
     kills = 0;
@@ -89,7 +82,6 @@ void Player::resetPlayer() {
 void Player::lazorHitPlayerCharacterSlot(Character* other) {
     Player *otherPlayer = qobject_cast<Player*> (other);
     kills++;
-    //qDebug() << Q_FUNC_INFO << kills;
 }
 
 int Player::numberOfWins() const {

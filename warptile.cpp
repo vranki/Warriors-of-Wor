@@ -13,7 +13,6 @@ WarpTile::WarpTile(TilePos pos, PlayfieldInfo *pfi) : MapTile(pos),  holePixmap(
 
 void WarpTile::setTarget(WarpTile *wt) {
     targetTile = wt;
-    qDebug() << Q_FUNC_INFO << position() << wt->position();
 }
 
 QPointF WarpTile::warpTo() {

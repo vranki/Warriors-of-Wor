@@ -1,5 +1,6 @@
 #include "character.h"
-#include "bomb.h"
+#include "maptile.h"
+#include "../bomb.h"
 
 Character::Character(QObject *parent,
                      PlayfieldInfo *pfinfo,
@@ -22,11 +23,8 @@ Character::Character(QObject *parent,
     invulnerable = 0;
     xaligned = yaligned = false;
 }
-Character::~Character() {
-}
 
 void Character::setCharacterSpeed(float spd) {
-    //qDebug() << Q_FUNC_INFO;
     characterSpeed = spd;
     animationTimer.setInterval(animationRate/(characterSpeed*speedScale));
 }
@@ -42,12 +40,10 @@ void Character::tick(float dt) {
         return;
     }
 
-    if(lazorBeam)
-        lazorBeam->tick(dt);
+    if(lazorBeam) lazorBeam->tick(dt);
 
     if(!tiles[0]) tiles[0] = currentTile();
     if(!currentTile()) return; // In outer space
-
     if(!controllable) return; // controlDir = QPoint();
     QPoint newControlDir = controlDir;
 
@@ -92,16 +88,8 @@ void Character::tick(float dt) {
             }
         }
     }
-    _direction=QPoint(newControlDir * characterSpeed * speedScale);
+    _direction = QPoint(newControlDir * characterSpeed * speedScale);
     QPointF movement = QPointF((_direction * dt).x(), (_direction * dt).y());
-    // Limit speed on really slow FPS
-    /*
-    float maxMovement = TILEW/2;
-    if(movement.x() > maxMovement) movement.setX(maxMovement);
-    if(movement.x() < -maxMovement) movement.setX(-maxMovement);
-    if(movement.y() > maxMovement) movement.setY(maxMovement);
-    if(movement.y() < -maxMovement) movement.setY(-maxMovement);
-*/
     QPointF newPos = pos() + movement;
 
     if(!currentTile()->e() && newPos.x() > currentTile()->x()) {

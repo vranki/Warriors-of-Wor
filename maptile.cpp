@@ -141,7 +141,7 @@ bool MapTile::canWalkTo(const QPoint& dir) const {
     MapTile *otherTile = tileTo(dir);
     if(!otherTile) return false;
     if(otherTile->content() & MT_CONTENT_SAND ||
-            otherTile->content() & MT_CONTENT_BLOCK )
+        otherTile->content() & MT_CONTENT_BLOCK )
         return false;
     return true;
 }
@@ -159,11 +159,7 @@ QRectF MapTile::boundingRect() const {
 }
 
 void MapTile::paint(QPainter *painter, const QStyleOptionGraphicsItem *option,
-                    QWidget *widget) {
-    //if(!highlight) return;
-    //if(content())
-    //    painter->drawRect(QRect(0,0,25,25));
-}
+                    QWidget *widget) { }
 
 void MapTile::setHighlight(bool hl) {
     highlight = hl;
