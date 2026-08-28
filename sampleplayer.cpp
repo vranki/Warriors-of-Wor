@@ -3,11 +3,13 @@
 SamplePlayer::SamplePlayer(QObject *parent) : QObject(parent)
 {
     bgChannel = -1;
+    bgSample = 0;
+    bgIsLoop = true;
+#ifdef HAVE_SDL_MIXER
     audio_rate = 22050;
     audio_format = AUDIO_S16SYS;
     audio_channels = 2;
     audio_buffers = 4096;
-    bgIsLoop = true;
     if (SDL_Init(SDL_INIT_AUDIO) != 0) {
         qDebug() << "Unable to initialize SDL: " << SDL_GetError();
     }
@@ -32,6 +34,9 @@ SamplePlayer::SamplePlayer(QObject *parent) : QObject(parent)
     loadSample("samples/bg_3.wav", GS_BACKGROUND_3);
     loadSample("samples/worluk_died.wav", GS_WORLUKDIED);
     loadSample("samples/wizard_died.wav", GS_WIZARDDIED);
+#else
+    qDebug() << "SDL2_mixer support not compiled in; audio disabled";
+#endif
     connect(&bgTimer, SIGNAL(timeout()), this, SLOT(nextBgSound()));
     bgTimer.setInterval(1000);
     bgTimer.setSingleShot(false);
@@ -39,24 +44,32 @@ SamplePlayer::SamplePlayer(QObject *parent) : QObject(parent)
 
 SamplePlayer::~SamplePlayer() {
     qDebug() << Q_FUNC_INFO;
+#ifdef HAVE_SDL_MIXER
     foreach(Mix_Chunk *sound, sounds)
         Mix_FreeChunk(sound);
     /* If these are done, the game crashes on quit. Possibly known SDL bug.
     Mix_CloseAudio();
     SDL_Quit();
     */
+#endif
 }
 
 void SamplePlayer::loadSample(QString file, gameSample sample) {
+#ifdef HAVE_SDL_MIXER
     //Load our WAV file from disk
     Mix_Chunk* sound = Mix_LoadWAV(file.toUtf8().data());
     sounds[sample] = sound;
     if(sound == NULL) {
         qDebug() << Q_FUNC_INFO << "Unable to load WAV file: " << file << Mix_GetError();
     }
+#else
+    Q_UNUSED(file);
+    Q_UNUSED(sample);
+#endif
 }
 
 int SamplePlayer::playSound(gameSample sample, int loops) {
+#ifdef HAVE_SDL_MIXER
     //qDebug() << "Playing sample " << sample;
     Mix_Chunk* sound = sounds.value(sample);
     if(!sound) {
@@ -70,6 +83,11 @@ int SamplePlayer::playSound(gameSample sample, int loops) {
     }
     //qDebug() << "Played sample " << sample << " sucessfully.";
     return channel;
+#else
+    Q_UNUSED(sample);
+    Q_UNUSED(loops);
+    return -1;
+#endif
 }
 
 int SamplePlayer::shoot() {
@@ -105,11 +123,15 @@ int SamplePlayer::spawn() {
 }
 
 void SamplePlayer::stopSound(int channel) {
+#ifdef HAVE_SDL_MIXER
     if(channel >= 0) {
         Mix_HaltChannel(channel);
     } else {
         qDebug() << "Trying to stop null channel!!";
     }
+#else
+    Q_UNUSED(channel);
+#endif
 }
 int SamplePlayer::deathexplosion() {
     return playSound(GS_DEATHEXPLOSION);

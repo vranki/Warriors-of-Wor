@@ -1,13 +1,16 @@
 #ifndef SAMPLEPLAYER_H
 #define SAMPLEPLAYER_H
 
-#include <SDL.h>
-#include <SDL_mixer.h>
 #include <QString>
 #include <QMap>
 #include <QDebug>
 #include <QTimer>
 #include <QObject>
+
+#ifdef HAVE_SDL_MIXER
+#include <SDL.h>
+#include <SDL_mixer.h>
+#endif
 
 enum gameSample {
     GS_SHOOT = 1,
@@ -59,12 +62,14 @@ public slots:
 private slots:
     void nextBgSound();
 private:
+#ifdef HAVE_SDL_MIXER
     QMap<gameSample, Mix_Chunk*> sounds;
     int channel;		//Channel on which our sound is played
     int audio_rate;		//Frequency of audio playback
     Uint16 audio_format; 	//Format of the audio we're playing
     int audio_channels;		//2 channels = stereo
     int audio_buffers;		//Size of the audio buffers in memory
+#endif
     int bgChannel;
     int bgSample;
     bool bgIsLoop;
