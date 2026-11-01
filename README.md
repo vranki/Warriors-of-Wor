@@ -35,8 +35,12 @@ Pairing wiimotes:
  - Repeat for all players. Press "+" to continue when all players have joined. 
  - Use wiimote in horizontal position. Only d-pad and button "1" are used in game.
 
-You can press "K" on keyboard to add a single keyboard player, controlled by
-arrow keys and space to fire. Yes, a second keyboard player is needed.
+Press "K" in player selection to add a keyboard player, or twice for two.
+A single keyboard player uses the arrow keys and Space to fire. With two
+keyboard players, the left (blue) player uses WASD and Ctrl to fire, and the
+right (yellow) player uses the arrow keys and Space to fire.
+Press "S" to continue through the menus, or "R" to clear players in player
+selection.
 
 ## Compilation
 
