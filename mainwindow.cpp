@@ -6,7 +6,6 @@ int playerColors[8] = {6, 7, 8, 0xF, 3, 2, 0xD, 9};
 MainWindow::MainWindow(QWidget *parent) : QGraphicsView(parent), samples(), field(this, characters) {
     QFontDatabase fontdb;
     fontdb.addApplicationFont("Adore64.ttf");
-    keyboardPlayerCreated = false;
     gameMode = 0;
     setScene(field.scene());
     connect(&mainTimer, SIGNAL(timeout()), this, SLOT(loopTimeout()));
@@ -59,18 +58,19 @@ void MainWindow::loopTimeout() {
 
 void MainWindow::keyPressEvent (QKeyEvent * e) {
     if(e->isAutoRepeat()) return;
-    QPoint oldDir = controllerDir;
+    if(handleLetterKey(e, true)) return;
+    QPoint oldDir = arrowKeysDirection;
     if(e->key()==Qt::Key_Left) {
-        controllerDir=QPoint(-1,0);
+        arrowKeysDirection=QPoint(-1,0);
         e->accept();
     } else if(e->key()==Qt::Key_Right) {
-        controllerDir=QPoint(1,0);
+        arrowKeysDirection=QPoint(1,0);
         e->accept();
     } else if(e->key()==Qt::Key_Up) {
-        controllerDir=QPoint(0,-1);
+        arrowKeysDirection=QPoint(0,-1);
         e->accept();
     } else if(e->key()==Qt::Key_Down) {
-        controllerDir=QPoint(0,1);
+        arrowKeysDirection=QPoint(0,1);
         e->accept();
     } else if(e->key()==Qt::Key_Space) {
         emit buttonPressed(1);
@@ -94,22 +94,60 @@ void MainWindow::keyPressEvent (QKeyEvent * e) {
             showFullScreen();
         }
         e->accept();
-    } else if(e->key()==Qt::Key_K && gameState == 0 /*&& !keyboardPlayerCreated*/ && characters.size()<8) {
+    } else if(e->key()==Qt::Key_K && gameState == GS_PLAYER_SELECT && keyboardPlayers.size()<2 && characters.size()<8) {
         Player *p = new Player(this,
                                &field,
                                &samples,
                                C64Palette::color(playerColors[characters.size()]),
-                               0,0,
+                               0,keyboardPlayers.size(),
                                characters.size());
+        if(keyboardPlayers.size() == 1) {
+            // With two keyboards, the first (blue) player uses the letter keys.
+            Player *left = keyboardPlayers.first();
+            disconnect(this, SIGNAL(controlInput(QPoint)), left, SLOT(setDirection(QPoint)));
+            disconnect(this, SIGNAL(buttonPressed(int)), left, SLOT(fire(int)));
+            left->setDirection(QPoint());
+            connect(this, SIGNAL(letterControlInput(QPoint)), left, SLOT(setDirection(QPoint)));
+            connect(this, SIGNAL(letterButtonPressed(int)), left, SLOT(fire(int)));
+        }
         setupPlayer(p, this);
-        keyboardPlayerCreated = true;
+        keyboardPlayers.append(p);
         e->accept();
     }
 
-    if(controllerDir != oldDir)
-        emit controlInput(controllerDir);
+    if(arrowKeysDirection != oldDir)
+        emit controlInput(arrowKeysDirection);
     if(!e->isAccepted())
         e->ignore();
+}
+
+bool MainWindow::handleLetterKey(QKeyEvent *event, bool pressed) {
+    if(keyboardPlayers.size() != 2 || (pressed && gameState != GS_RUNNING))
+        return false;
+
+    QPoint dir;
+    switch(event->key()) {
+    case Qt::Key_A: dir = QPoint(-1, 0); break;
+    case Qt::Key_D: dir = QPoint(1, 0); break;
+    case Qt::Key_W: dir = QPoint(0, -1); break;
+    case Qt::Key_S: dir = QPoint(0, 1); break;
+    case Qt::Key_Control:
+        if(pressed) emit letterButtonPressed(1);
+        event->accept();
+        return true;
+    default:
+        return false;
+    }
+
+    QPoint oldDir = wasdKeysDirection;
+    if(pressed)
+        wasdKeysDirection = dir;
+    else if(wasdKeysDirection == dir)
+        wasdKeysDirection = QPoint();
+    if(wasdKeysDirection != oldDir)
+        emit letterControlInput(wasdKeysDirection);
+    event->accept();
+    return true;
 }
 
 void MainWindow::setupPlayer(Player* p, QObject *controller) {
@@ -133,17 +171,18 @@ void MainWindow::stopGame() {
 
 void MainWindow::keyReleaseEvent (QKeyEvent * e) {
     if(e->isAutoRepeat()) return;
-    QPoint oldDir = controllerDir;
+    if(handleLetterKey(e, false)) return;
+    QPoint oldDir = arrowKeysDirection;
     if(e->key()==Qt::Key_Left || e->key()==Qt::Key_Right) {
-        controllerDir.setX(0);
+        arrowKeysDirection.setX(0);
         e->accept();
     } else if(e->key()==Qt::Key_Up || e->key()==Qt::Key_Down) {
-        controllerDir.setY(0);
+        arrowKeysDirection.setY(0);
         e->accept();
     }
 
-    if(controllerDir != oldDir)
-        emit controlInput(controllerDir);
+    if(arrowKeysDirection != oldDir)
+        emit controlInput(arrowKeysDirection);
     if(!e->isAccepted())
         e->ignore();
 }
@@ -228,7 +267,9 @@ void MainWindow::resetPlayers() {
         characters.removeOne(c);
         c->deleteLater();
     }
-    keyboardPlayerCreated = 0;
+    keyboardPlayers.clear();
+    arrowKeysDirection = QPoint();
+    wasdKeysDirection = QPoint();
 }
 
 

@@ -57,18 +57,22 @@ public slots:
 signals:
     void controlInput(QPoint dir);
     void buttonPressed(int button);
+    void letterControlInput(QPoint dir);
+    void letterButtonPressed(int button);
     void playerFound(Player *player);
 
 protected:
     virtual void resizeEvent(QResizeEvent *event);
 private:
     void setupPlayer(Player* p, QObject *controller);
+    bool handleLetterKey(QKeyEvent *event, bool pressed);
     void stopGame();
     SamplePlayer samples;
     Playfield field;
     QTimer mainTimer;
     QElapsedTimer time;
-    QPoint controllerDir;
+    QPoint arrowKeysDirection;
+    QPoint wasdKeysDirection;
 #ifdef HAVE_CWIID
     WiimoteFinder wmFinder;
 #endif
@@ -77,7 +81,7 @@ private:
     RoundEndScreen *roundEndScreen;
     GameOverScreen *gameOverScreen;
     QList<Character*> characters;
-    bool keyboardPlayerCreated;
+    QList<Player*> keyboardPlayers;
     gameStates gameState; // 0 = player select, 1= running, 2=game select, 3=round end, 4=game end
     GameMode *gameMode;
 };
