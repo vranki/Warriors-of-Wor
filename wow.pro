@@ -10,7 +10,6 @@ QT += widgets
 TARGET = wow
 TEMPLATE = app
 CONFIG   += link_pkgconfig
-PKGCONFIG += sdl2
 
 !contains(CONFIG, no_cwiid) {
     packagesExist(cwiid) {
@@ -24,7 +23,16 @@ PKGCONFIG += sdl2
     message("cwiid disabled; Wiimote support disabled")
 }
 
-LIBS += -lSDL2_mixer
+!contains(CONFIG, no_sdl) {
+    packagesExist(sdl2 SDL2_mixer) {
+        PKGCONFIG += sdl2 SDL2_mixer
+        DEFINES += HAVE_SDL_MIXER
+    } else {
+        message("SDL2_mixer not found; audio disabled")
+    }
+} else {
+    message("SDL disabled; audio disabled")
+}
 
 SOURCES += main.cpp\
         mainwindow.cpp \
